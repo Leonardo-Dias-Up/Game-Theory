@@ -49,7 +49,7 @@ def jogar_cpu_ou_so_mensagem(message):
         return  # Adicionado o return para sair da função
 
     # Se o jogador já está na lista de jogadores, verificar se a escolha é válida
-    if "text" in message and message.text.lower() in ["cooperar", "trair"]:
+    if hasattr(message, 'text') and message.text.lower() in ["cooperar", "trair"]:
         players[player_id]["decision"] = message.text.lower()
         opponent_id = players[player_id]["opponent_id"]
         player_decision = players[player_id]["decision"]
