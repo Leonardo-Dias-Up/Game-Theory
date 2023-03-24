@@ -80,7 +80,7 @@ def jogar_contra_cpu(message):
         else:
             bot.send_message(player_id, "Digite 'cooperar' ou 'trair' para fazer sua escolha.")
     else:
-        bot.send_message(player_id, "Digite /cpu para jogar contra o computador.")
+        bot.send_message(player_id, "Obrigado por jogar o Dilema do Prisioneiro, caso queira jogar novamente digite /start")
 
 # ENCERRANDO O JOGO
 def fim_de_jogo(player_id, opponent_id):
