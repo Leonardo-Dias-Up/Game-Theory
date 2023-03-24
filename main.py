@@ -16,8 +16,10 @@ jogadores_disponiveis = {}
 
 # DESENVOLVEDORES DO BOT
 @bot.message_handler(commands=['help'])
-def start_message(message):
-    bot.send_message(message, "Desenvolvedores: Leonardo Dias e Djalma. 2023")
+def describe_project(message):
+    text = "Desenvolvedores: Leonardo Dias e Djalma. 2023"
+    bot.send_message(message.chat.id, text)
+    describe_project(message)
     
 # BOAS VINDAS
 def welcome_message(message):
@@ -25,7 +27,7 @@ def welcome_message(message):
            "O objetivo do jogo é maximizar sua pontuação ao cooperar ou trair seu oponente. Cada jogador deve escolher 'cooperar' ou 'trair'.\n\n" \
            "Digite 'cooperar' ou 'trair' para jogar. Você pode jogar contra outros jogadores ou contra a máquina. Para jogar contra a máquina, digite /cpu. Para jogar contra outros jogadores, digite /multiplayer."
     bot.send_message(message.chat.id, text)
-
+    
 # INICIO JOGO
 @bot.message_handler(commands=['start'])
 def start_message(message):
