@@ -43,7 +43,13 @@ def jogar_contra_cpu(message):
 
             if players[opponent_id]["decision"] is not None:
                 player_decision = players[player_id]["decision"]
-                opponent_decision = players[opponent_id]["decision"]
+                
+                # Verifica se o oponente é um jogador humano ou a CPU
+                if opponent_id == player_id:
+                    opponent_decision = choice(["cooperar", "trair"])
+                else:
+                    opponent_decision = players[opponent_id]["decision"]
+                
                 if player_decision == "cooperar" and opponent_decision == "cooperar":
                     bot.send_message(player_id, "Ambos cooperaram. +2 pontos cada.")
                     scores[player_id] += 2
