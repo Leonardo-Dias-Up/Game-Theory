@@ -121,6 +121,7 @@ def receive_registration_info(message):
     # Envia uma mensagem de confirmação ao jogador
     bot.send_message(jogador_id, "Cadastro realizado com sucesso! Agora você está disponível para jogar.")
 
+# Registra novos usuário para o pareamento
 @bot.message_handler(commands=['register'])
 def register_message(message):
     jogador_id = message.chat.id
@@ -336,45 +337,64 @@ def iniciar_rodada(player_id, opponent_id):
     iniciar_jogo(player_id, opponent_id, player_decision)
 
 
+# Define um dicionário para armazenar as salas de jogo
+game_rooms = {}
+
 # Handler para o comando /multiplayer
 @bot.message_handler(commands=['multiplayer'])
-
-# Inicio do jogo para multiplayer
-def multiplayer_message(message):
-    # Buscar jogadores disponíveis no banco de dados
-    jogadores_disponiveis = buscar_jogadores_disponiveis()
+def jogar_multiplayer_mensagem(message):
+    player_id = message.from_user.id
     
-    jogador1 = None
-    if len(jogadores_disponiveis) < 2:
-        bot.send_message(message.chat.id, "Desculpe, não há jogadores suficientes disponíveis no momento.")
+    if player_id not in game_rooms:
+        # Adiciona o jogador a uma nova sala de jogo
+        game_rooms[player_id] = {"name": message.from_user.first_name, "decision": None, "opponent_id": None}
+        bot.send_message(player_id, "Você foi adicionado à sala de jogo. Aguarde um adversário.")
     else:
-        # Escolher dois jogadores aleatoriamente
-        jogador1, jogador2 = sample(jogadores_disponiveis, k=2)
-        # Atualizar status de disponibilidade dos jogadores no banco de dados
-        atualizar_disponibilidade_jogador(jogador1[0], False)
-        atualizar_disponibilidade_jogador(jogador2[0], False)
-        
-        players[jogador1[0]]["opponent_id"] = jogador2[0]
-        players[jogador2[0]]["opponent_id"] = jogador1[0]
+        bot.send_message(player_id, "Você já está na sala de jogo. Aguarde um adversário.")
 
-        bot.send_message(jogador1[0], "Você está jogando contra " + jogador2[1])
-       
-    # Encerrar o jogo e enviar a pontuação final
-    if jogador1 is not None:
-        bot.send_message(jogador1[0], "O jogo acabou!")
-        bot.send_message(jogador1[0], f"Sua pontuação final é: {scores[jogador1[0]]}")
-        bot.send_message(jogador2[0], "O jogo acabou!")
-        bot.send_message(jogador2[0], f"Sua pontuação final é: {scores[jogador2[0]]}")
-        
-        # Remover jogadores e pontuações
-        del players[jogador1[0]]
-        del players[jogador2[0]]
-        del scores[jogador1[0]]
-        del scores[jogador2[0]]
-        
-        # Atualizar status de disponibilidade dos jogadores no banco de dados
-        atualizar_disponibilidade_jogador(jogador1[0], True)
-        atualizar_disponibilidade_jogador(jogador2[0], True)
+# Handler para as mensagens enviadas pelos jogadores na sala de jogo
+@bot.message_handler(func=lambda message: True)
+def jogar_contra_jogador(message):
+    player_id = message.from_user.id
+
+    # Verifica se o jogador está em uma sala de jogo
+    if player_id in game_rooms:
+        opponent_id = game_rooms[player_id]["opponent_id"]
+
+        # Verifica se o jogador tem um adversário na sala de jogo
+        if opponent_id is not None:
+            # Encaminha a mensagem do jogador para o seu adversário
+            bot.send_message(opponent_id, f"{game_rooms[player_id]['name']}: {message.text}")
+        else:
+            bot.send_message(player_id, "Aguarde um adversário.")
+    else:
+        multiplayer_message(message) # chama a função multiplayer
+
+# Função para adicionar um jogador a uma sala de jogo
+def add_player_to_game_room(player_id):
+    global game_rooms
+
+    # Verifica se há uma sala de jogo com um jogador aguardando adversário
+    waiting_rooms = [room for room in game_rooms.values() if room["opponent_id"] is None]
+
+    if waiting_rooms:
+        # Escolhe aleatoriamente uma sala de jogo com um jogador aguardando adversário
+        room = choice(waiting_rooms)
+
+        # Adiciona o jogador à sala de jogo selecionada
+        room["opponent_id"] = player_id
+        game_rooms[player_id] = {"name": room["name"], "decision": None, "opponent_id": room["opponent_id"]}
+
+        # Notifica ambos os jogadores da sala de jogo
+        bot.send_message(room["opponent_id"], "Adversário encontrado. O jogo começará em breve.")
+        bot.send_message(player_id, "Adversário encontrado. O jogo começará em breve.")
+    else:
+        # Cria uma nova sala de jogo com o jogador aguardando adversário
+        game_rooms[player_id] = {"name": None, "decision": None, "opponent_id": None}
+        bot.send_message(player_id, "Você foi adicionado à sala de jogo. Aguarde um adversário.")
+
+def multiplayer_message(message):
+    bot.send_message(message.chat.id, "Para jogar multiplayer, digite /multiplayer. Você será adicionado a uma sala de jogo e aguardará por um adversário.")
 
 
 # Handler para o comando /pontuacao
