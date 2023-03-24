@@ -1,13 +1,6 @@
-from random import randint
 from random import choice
-import sys
 import telebot   
-import pandas as pd
-import requests
-import json
-import time
-import re
-import random
+from random import sample
 
 CHAVE_API_TELEGRAM = "5570452334:AAHmIZApvbKb1wd8hSiOj6BKu6-TNMINd-8"
 
@@ -21,22 +14,10 @@ scores = {}
 round_number = 0
 jogadores_disponiveis = {}
 
-# DESENVOLVEDORES DO BOT
-@bot.message_handler(commands=['help'])
-def start_message(message):
-    bot.send_message(message, "Desenvolvedores: Leonardo Dias e Djalma. 2023")
-    
-# BOAS VINDAS
-def welcome_message(message):
-    text = "Bem-vindo ao jogo do dilema dos prisioneiros!\n\n" \
-           "O objetivo do jogo é maximizar sua pontuação ao cooperar ou trair seu oponente. Cada jogador deve escolher 'cooperar' ou 'trair'.\n\n" \
-           "Digite 'cooperar' ou 'trair' para jogar. Você pode jogar contra outros jogadores ou contra a máquina. Para jogar contra a máquina, digite /cpu. Para jogar contra outros jogadores, digite /multiplayer."
-    bot.send_message(message.chat.id, text)
-
 # INICIO JOGO
 @bot.message_handler(commands=['start'])
 def start_message(message):
-    welcome_message(message)
+    bot.send_message(message, "Bem Vindo")
 
 # JOGANDO CONTRA A CPU
 @bot.message_handler(commands=['cpu'])
@@ -48,47 +29,6 @@ def jogar_contra_cpu(message):
         bot.send_message(player_id, "Você já está jogando contra outro jogador. \
                                      Digite qualquer coisa para continuar o jogo.")
         return
-
-    # Inicializa o jogador na lista de jogadores
-    players[player_id] = {"name": message.from_user.first_name, "decision": None, "opponent_id": None}
-
-    # Envia a mensagem de boas-vindas e instruções
-    bot.send_message(player_id, "Você escolheu jogar contra a CPU. Digite 'cooperar' ou 'trair' para fazer sua escolha.")
-
-    # Faz a jogada da CPU
-    cpu_decision = choice(["cooperar", "trair"])
-
-    # Realiza a lógica do jogo
-    player_decision = None
-
-    if message.text.lower() in ["cooperar", "trair"]:
-        player_decision = message.text.lower()
-
-    if player_decision:
-        players[player_id]["decision"] = player_decision
-        players[player_id]["opponent_id"] = "CPU"
-
-        bot.send_message(player_id, f"Você jogou: {player_decision}")
-
-        if cpu_decision == "cooperar" and player_decision == "cooperar":
-            scores[player_id] += 2
-            bot.send_message(player_id, "Você e a CPU cooperaram. Ambos ganharam 2 pontos!")
-        elif cpu_decision == "cooperar" and player_decision == "trair":
-            scores[player_id] -= 1
-            bot.send_message(player_id, "Você cooperou, mas a CPU traiu. Você perdeu 1 ponto!")
-        elif cpu_decision == "trair" and player_decision == "cooperar":
-            scores[player_id] += 3
-            bot.send_message(player_id, "Você traiu, mas a CPU cooperou. Você ganhou 3 pontos!")
-        else:
-            bot.send_message(player_id, "Você e a CPU traíram. Ninguém ganhou pontos.")
-
-        bot.send_message(player_id, f"A CPU jogou: {cpu_decision}")
-        bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
-        bot.send_message(player_id, "Obrigado por jogar o Dilema do Prisioneiro, \
-                          digite /cpu para jogar contra o computador, \
-                         /multiplayer para jogar contra uma pessoa ou digite qualquer outra coisa para sair.")
-        players.pop(player_id)
-
 
 # DILEMA DOS PRISIONEIROS
 @bot.message_handler(func=lambda message: True)
@@ -110,11 +50,12 @@ def jogar_contra_cpu(message):
     
     # Escolher oponente aleatório
     if jogadores_disponiveis:
-          opponent_id = random.choice([pid for pid in jogadores_disponiveis if pid != player_id])
+          opponent_id = choice([pid for pid in jogadores_disponiveis if pid != player_id])
     else:
           bot.send_message(message.chat.id, "Não há jogadores disponíveis no momento.")
     
     # Iniciar o jogo entre o jogador e o oponente
+    player_decision = message.chat.id
     iniciar_jogo(player_id, opponent_id, player_decision)
     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
 
@@ -190,7 +131,7 @@ def multiplayer_message(message):
         bot.send_message(message.chat.id, "Desculpe, não há jogadores suficientes disponíveis no momento.")
     else:
         # Escolher dois jogadores aleatoriamente
-        jogador1, jogador2 = random.sample(jogadores_disponiveis, k=2)
+        jogador1, jogador2 = sample(jogadores_disponiveis, k=2)
         players[jogador1]["opponent_id"] = jogador2
         players[jogador2]["opponent_id"] = jogador1
 
