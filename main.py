@@ -341,14 +341,14 @@ def iniciar_rodada(player_id, opponent_id):
 game_rooms = {}
 
 # Handler para o comando /multiplayer
+# Handler para o comando /multiplayer
 @bot.message_handler(commands=['multiplayer'])
 def jogar_multiplayer_mensagem(message):
     player_id = message.from_user.id
     
     if player_id not in game_rooms:
         # Adiciona o jogador a uma nova sala de jogo
-        game_rooms[player_id] = {"name": message.from_user.first_name, "decision": None, "opponent_id": None}
-        bot.send_message(player_id, "Você foi adicionado à sala de jogo. Aguarde um adversário.")
+        add_player_to_game_room(player_id)
     else:
         bot.send_message(player_id, "Você já está na sala de jogo. Aguarde um adversário.")
 
