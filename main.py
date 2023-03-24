@@ -56,10 +56,11 @@ def jogar_contra_cpu(message):
     player_id = message.from_user.id
 
     # Adicionar jogador à lista de jogadores disponíveis
-    if player_id not in jogadores_disponiveis:
-        jogadores_disponiveis.append(player_id)
-        bot.send_message(player_id, "Aguardando por outro jogador...")
-        return
+    for player_id in jogadores_disponiveis.keys():
+     if not jogadores_disponiveis[player_id]['jogando']:
+          jogadores_disponiveis.append(player_id)
+          bot.send_message(player_id, "Aguardando por outro jogador...")
+          return
     
     # Escolher oponente aleatório
     opponent_id = random.choice([pid for pid in jogadores_disponiveis if pid != player_id])
