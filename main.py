@@ -81,7 +81,7 @@ def start_message(message):
     c.execute("SELECT * FROM jogadores WHERE id=?", (jogador_id,))
     row = c.fetchone()
     if row is None:
-        c.execute("INSERT INTO jogadores (id, nome, estado) VALUES (?, ?, ?)", (jogador_id, message.chat.first_name, 'INICIO'))
+        c.execute("INSERT INTO jogadores (id, nome, disponivel) VALUES (?, ?, ?)", (jogador_id, message.chat.first_name, 'INICIO'))
         conn.commit()
         bot.reply_to(message, "Bem-vindo ao jogo!")
     else:
