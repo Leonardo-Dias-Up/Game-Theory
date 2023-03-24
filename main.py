@@ -199,7 +199,6 @@ def iniciar_jogo(player_id, opponent_id, player_decision):
 # Handler para o comando /multiplayer
 @bot.message_handler(commands=['multiplayer'])
 
-# Inicio do jogo para multiplayer
 def multiplayer_message(message):
     jogador1 = None
     if len(jogadores_disponiveis) < 2:
@@ -209,6 +208,10 @@ def multiplayer_message(message):
         jogador1, jogador2 = sample(jogadores_disponiveis, k=2)
         players[jogador1]["opponent_id"] = jogador2
         players[jogador2]["opponent_id"] = jogador1
+        
+        # Remover jogadores pareados da lista de jogadores disponíveis
+        jogadores_disponiveis.remove(jogador1)
+        jogadores_disponiveis.remove(jogador2)
 
         bot.send_message(jogador1, "Você está jogando contra " + players[jogador2]["name"])
        
@@ -230,6 +233,7 @@ def multiplayer_message(message):
             jogadores_disponiveis.remove(jogador1)
         if jogador2 in jogadores_disponiveis:
             jogadores_disponiveis.remove(jogador2)
+
 
 # Handler para o comando /pontuacao
 @bot.message_handler(commands=['pontuacao'])
