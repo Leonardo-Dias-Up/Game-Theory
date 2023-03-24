@@ -1,6 +1,7 @@
 from random import choice
 import telebot
 
+# API
 CHAVE_API_TELEGRAM = "5570452334:AAHmIZApvbKb1wd8hSiOj6BKu6-TNMINd-8"
 
 bot = telebot.TeleBot(CHAVE_API_TELEGRAM)
