@@ -54,21 +54,21 @@ def jogar_contra_cpu(message):
 
             if players[opponent_id]["decision"] is not None:
                 player_decision = players[player_id]["decision"]
-                opponent_decision = players[opponent_id]["decision"]
+                opponent_decision = choice(["cooperar", "trair"])
+                players[player_id]["opponent_decision"] = opponent_decision
+                bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
+
                 if player_decision == "cooperar" and opponent_decision == "cooperar":
-                    bot.send_message(player_id, "Ambos cooperaram. +2 pontos cada.")
                     scores[player_id] += 2
-                    scores[opponent_id] += 2
+                    bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam 2 pontos!")
                 elif player_decision == "cooperar" and opponent_decision == "trair":
-                    bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. +0 pontos para você, +3 pontos para seu oponente.")
-                    scores[opponent_id] += 3
+                    scores[player_id] -= 1
+                    bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu 1 ponto!")
                 elif player_decision == "trair" and opponent_decision == "cooperar":
-                    bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. +3 pontos para você, +0 pontos para seu oponente.")
                     scores[player_id] += 3
-                elif player_decision == "trair" and opponent_decision == "trair":
-                    bot.send_message(player_id, "Ambos traíram. +1 ponto cada.")
-                    scores[player_id] += 1
-                    scores[opponent_id] += 1
+                    bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 3 pontos!")
+                else:
+                    bot.send_message(player_id, "Você e seu oponente traíram. Ninguém ganhou pontos.")
 
                 bot.send_message(player_id, f"Sua escolha: {player_decision}")
                 bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
