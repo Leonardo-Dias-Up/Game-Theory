@@ -147,6 +147,7 @@ def iniciar_jogo(player_id, opponent_id, player_decision):
 # Comando /multiplayer
 @bot.message_handler(commands=['multiplayer'])
 def multiplayer_message(message):
+    jogador1 = None
     if len(jogadores_disponiveis) < 2:
         bot.send_message(message.chat.id, "Desculpe, não há jogadores suficientes disponíveis no momento.")
     else:
@@ -158,22 +159,23 @@ def multiplayer_message(message):
         bot.send_message(jogador1, "Você está jogando contra " + players[jogador2]["name"])
        
     # Encerrar o jogo e enviar a pontuação final
-    bot.send_message(jogador1, "O jogo acabou!")
-    bot.send_message(jogador1, f"Sua pontuação final é: {scores[jogador1]}")
-    bot.send_message(jogador2, "O jogo acabou!")
-    bot.send_message(jogador2, f"Sua pontuação final é: {scores[jogador2]}")
-    
-    # Remover jogadores e pontuações
-    del players[jogador1]
-    del players[jogador2]
-    del scores[jogador1]
-    del scores[jogador2]
-    
-    # Remover jogadores disponíveis
-    if jogador1 in jogadores_disponiveis:
-        jogadores_disponiveis.remove(jogador1)
-    if jogador2 in jogadores_disponiveis:
-        jogadores_disponiveis.remove(jogador2)
+    if jogador1 is not None:
+        bot.send_message(jogador1, "O jogo acabou!")
+        bot.send_message(jogador1, f"Sua pontuação final é: {scores[jogador1]}")
+        bot.send_message(jogador2, "O jogo acabou!")
+        bot.send_message(jogador2, f"Sua pontuação final é: {scores[jogador2]}")
+        
+        # Remover jogadores e pontuações
+        del players[jogador1]
+        del players[jogador2]
+        del scores[jogador1]
+        del scores[jogador2]
+        
+        # Remover jogadores disponíveis
+        if jogador1 in jogadores_disponiveis:
+            jogadores_disponiveis.remove(jogador1)
+        if jogador2 in jogadores_disponiveis:
+            jogadores_disponiveis.remove(jogador2)
 
 @bot.message_handler(commands=['pontuacao'])
 def pontuacao_message(message):
