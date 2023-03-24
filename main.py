@@ -86,12 +86,76 @@ def start_message(message):
         bot.reply_to(message, "Bem-vindo ao jogo!")
     else:
         jogador_nome = row[1]
-        bot.reply_to(message, "Bem-vindo de volta, " + jogador_nome + "!")
-    bot.reply_to(message, "Olá, " + jogador_nome + "! Você está disponível para jogar!")
+    bot.reply_to(message, "Bem-vindo, " + jogador_nome + "! Você está disponível para jogar!")
     conn.close()        
             
     # Imprime o menu com a descrição do jogo
     welcome_message(message)
+
+# Handler para o comando /register
+@bot.message_handler(commands=['register'])
+def register_message(message):
+    # Envia uma mensagem de boas-vindas e instruções para o jogador
+    bot.send_message(message.chat.id, "Bem-vindo ao jogo! Por favor, preencha o formulário de cadastro com as seguintes informações:")
+    bot.send_message(message.chat.id, "Nome:")
+    
+    # Adiciona o jogador à lista de jogadores aguardando cadastro
+    jogadores_aguardando_cadastro.append(message.chat.id)
+
+# Handler para receber as informações de cadastro
+@bot.message_handler(func=lambda message: message.chat.id in jogadores_aguardando_cadastro)
+def receive_registration_info(message):
+    jogador_id = message.chat.id
+    jogador_nome = message.text
+    
+    # Atualiza o nome do jogador no banco de dados
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("UPDATE jogadores SET nome = ?, disponivel = ? WHERE id = ?", (jogador_nome, 1, jogador_id))
+    conn.commit()
+    conn.close()
+    
+    # Remove o jogador da lista de jogadores aguardando cadastro
+    jogadores_aguardando_cadastro.remove(jogador_id)
+    
+    # Envia uma mensagem de confirmação ao jogador
+    bot.send_message(jogador_id, "Cadastro realizado com sucesso! Agora você está disponível para jogar.")
+
+@bot.message_handler(commands=['register'])
+def register_message(message):
+    jogador_id = message.chat.id
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM jogadores WHERE id=?", (jogador_id,))
+    row = c.fetchone()
+    if row is None:
+        jogadores_aguardando_cadastro.append(jogador_id)
+        bot.reply_to(message, "Digite o seu nome completo para se cadastrar.")
+    else:
+        bot.reply_to(message, "Você já está cadastrado. Use o comando /disponivel para ficar disponível para jogar.")
+    conn.close()
+
+# Lista de jogadores aguardando cadastro
+jogadores_aguardando_cadastro = []
+
+# Handler para receber as informações de cadastro
+@bot.message_handler(func=lambda message: message.chat.id in jogadores_aguardando_cadastro)
+def receive_registration_info(message):
+    jogador_id = message.chat.id
+    jogador_nome = message.text
+    
+    # Atualiza o nome do jogador no banco de dados
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("UPDATE jogadores SET nome = ?, disponivel = ? WHERE id = ?", (jogador_nome, 1, jogador_id))
+    conn.commit()
+    conn.close()
+    
+    # Remove o jogador da lista de jogadores aguardando cadastro
+    jogadores_aguardando_cadastro.remove(jogador_id)
+    
+    # Envia uma mensagem de confirmação ao jogador
+    bot.send_message(jogador_id, "Cadastro realizado com sucesso! Agora você está disponível para jogar.")
 
 # Handler para o comando /close
 @bot.message_handler(commands=['close'])
@@ -277,7 +341,6 @@ def iniciar_rodada(player_id, opponent_id):
 
 # Inicio do jogo para multiplayer
 def multiplayer_message(message):
-    multiplayer_message(message)
     # Buscar jogadores disponíveis no banco de dados
     jogadores_disponiveis = buscar_jogadores_disponiveis()
     
