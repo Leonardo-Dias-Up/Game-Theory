@@ -105,7 +105,7 @@ def jogar_contra_cpu(message):
     for player_id in jogadores_disponiveis.keys():
      if not jogadores_disponiveis[player_id]['jogando']:
           jogadores_disponiveis.append(player_id)
-          bot.send_message(player_id, "Aguardando por outro jogador...")''
+          bot.send_message(player_id, "Aguardando por outro jogador...")
           return
     
     # Escolher oponente aleatório
@@ -116,7 +116,8 @@ def jogar_contra_cpu(message):
     
     # Iniciar o jogo entre o jogador e o oponente
     iniciar_jogo(player_id, opponent_id, player_decision)
-    
+    bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
+
     # Jogando o oponente
     if player_id in players:
         opponent_id = players[player_id]["opponent_id"]
