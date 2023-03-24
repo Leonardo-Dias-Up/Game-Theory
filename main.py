@@ -93,7 +93,6 @@ def start_message(message):
     # Imprime o menu com a descrição do jogo
     welcome_message(message)
 
-
 # Handler para o comando /close
 @bot.message_handler(commands=['close'])
 def close_message(message):
@@ -157,7 +156,7 @@ def jogar_contra_cpu(message):
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
                     bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam 2 pontos!")
-                    bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
+                    bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou /close para finalizar, caso queria jogar pvp /multiplayer ou /start.")
                     players.pop(player_id)
                     
                 elif player_decision == "cooperar" and opponent_decision == "trair":
@@ -168,7 +167,7 @@ def jogar_contra_cpu(message):
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
                     bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu 1 ponto!")
-                    bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
+                    bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou /close para finalizar, caso queria jogar pvp /multiplayer ou /start.")
                     players.pop(player_id)
                     
                 elif player_decision == "trair" and opponent_decision == "cooperar":
@@ -179,7 +178,7 @@ def jogar_contra_cpu(message):
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
                     bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 3 pontos!")
-                    bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
+                    bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou /close para finalizar, caso queria jogar pvp /multiplayer ou /start.")
                     players.pop(player_id)
                     
                 else:                  
@@ -188,7 +187,7 @@ def jogar_contra_cpu(message):
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
                     bot.send_message(player_id, "Você e seu oponente traíram. Ninguém ganhou pontos.")
-                    bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
+                    bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou /close para finalizar, caso queria jogar pvp /multiplayer ou /start.")
                     players.pop(player_id)
                    
         else:
@@ -278,6 +277,7 @@ def iniciar_rodada(player_id, opponent_id):
 
 # Inicio do jogo para multiplayer
 def multiplayer_message(message):
+    multiplayer_message(message)
     # Buscar jogadores disponíveis no banco de dados
     jogadores_disponiveis = buscar_jogadores_disponiveis()
     
