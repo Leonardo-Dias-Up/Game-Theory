@@ -1,4 +1,4 @@
-import random
+from random import choice
 import telebot
 
 bot = telebot.TeleBot("YOUR_TELEGRAM_BOT_TOKEN")
@@ -66,7 +66,7 @@ def play_vs_cpu(message):
     if player.decision == "cooperar":
         cpu_decision = "trair"
     else:
-        cpu_decision = random.choice(["cooperar", "trair"])
+        cpu_decision = choice(["cooperar", "trair"])
 
     player.opponent = Player(0, "CPU")
     player.opponent.decision = cpu_decision
@@ -108,7 +108,7 @@ def play_game(message):
         bot.send_message(message.chat.id, "Você ainda não iniciou um jogo. Digite /start para começar.")
 
     elif game_mode == "cpu":
-        cpu_decision = random.choice(['cooperar', 'trair'])
+        cpu_decision = choice(['cooperar', 'trair'])
         player.opponent = Player(None, "Máquina")
         player.opponent.play(cpu_decision)
         player.play(message.text)
