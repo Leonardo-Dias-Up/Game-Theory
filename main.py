@@ -106,7 +106,7 @@ def jogar_contra_cpu(message):
                 elif player_decision == "trair" and opponent_decision == "cooperar":
                     scores[player_id] += 3
                     bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 3 pontos!")
-               else:
+                else:
                     bot.send_message(player_id, "Você e seu oponente traíram. Ninguém ganhou pontos.")
 
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
