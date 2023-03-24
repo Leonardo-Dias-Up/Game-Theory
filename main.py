@@ -6,15 +6,6 @@ from random import sample
 import sqlite3
 import threading
 
-# Create a SQLite connection pool with one connection per thread
-connection_pool = threading.local()
-
-def get_connection():
-    # Return the connection for the current thread, or create a new one
-    if not hasattr(connection_pool, 'connection'):
-        connection_pool.connection = sqlite3.connect('database.db')
-    return connection_pool.connection
-    
 # Chave da API do Telegram
 CHAVE_API_TELEGRAM = "5570452334:AAHmIZApvbKb1wd8hSiOj6BKu6-TNMINd-8"
 
@@ -42,9 +33,9 @@ def describe_project(message):
 @bot.message_handler(commands=['help'])
 def help_message(message):
     describe_project(message)
-    
+       
 # Conectar ao banco de dados
-conn = get_connection()
+conn = sqlite3.connect('database.db')
 c = conn.cursor()
 
 # Criação da tabela de jogadores
@@ -82,32 +73,22 @@ def welcome_message(message):
     
 # Handler para o comando /start
 @bot.message_handler(commands=['start'])
+@bot.message_handler(commands=['start'])
 def start_message(message):
-    
-    # Verifica se o usuário já existe no banco de dados
-    jogador_id = message.from_user.id
+    jogador_id = message.chat.id
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
     c.execute("SELECT * FROM jogadores WHERE id=?", (jogador_id,))
-    jogador = c.fetchone()
-    
-    if jogador is None:
-        # Se o usuário não existe, adiciona ao banco de dados com disponibilidade para jogar
-        jogador_nome = input("Qual o seu nome? ")
-        jogador_sobrenome = input("Qual o seu sobrenome? ")
-        
-        c.execute("INSERT INTO jogadores (id, nome, sobrenome, disponivel) VALUES (?, ?, ?, 1)",
-                  (jogador_id, jogador_nome, jogador_sobrenome))
-        
+    row = c.fetchone()
+    if row is None:
+        c.execute("INSERT INTO jogadores (id, nome, estado) VALUES (?, ?, ?)", (jogador_id, message.chat.first_name, 'INICIO'))
         conn.commit()
-        
-        bot.reply_to(message, "Olá, " + jogador_nome + "! Você está disponível para jogar!")
-        
+        bot.reply_to(message, "Bem-vindo ao jogo!")
     else:
-        # Se o usuário já existe, atualiza a disponibilidade para jogar
-        c.execute("UPDATE jogadores SET disponivel=1 WHERE id=?", (jogador_id,))
-        conn.commit()
-        
-        bot.reply_to(message, "Você está disponível para jogar!")
-    
+        bot.reply_to(message, "Bem-vindo de volta!")
+    conn.close()        
+    bot.reply_to(message, "Olá, " + jogador_nome + "! Você está disponível para jogar!")
+            
     # Imprime o menu com a descrição do jogo
     welcome_message(message)
 
