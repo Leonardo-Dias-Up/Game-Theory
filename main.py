@@ -21,43 +21,51 @@ def start_message(message):
 
 # JOGANDO CONTRA A CPU
 @bot.message_handler(commands=['cpu'])
-def jogar_contra_cpu(message):
-    player_id = message.chat.id
+def jogar_so_mensagem(message):
+    player_id = message.from_user.id
 
-    # Verifica se o jogador já está em uma partida
-    if player_id in players:
-        bot.send_message(player_id, "Você já está jogando contra outro jogador. \
-                                     Digite qualquer coisa para continuar o jogo.")
-        return
+    if player_id not in players:
+        players[player_id] = {"name": message.from_user.first_name, "decision": None, "opponent_id": player_id}
+        scores[player_id] = 0
+        bot.send_message(player_id, "Digite 'cooperar' ou 'trair' para fazer sua escolha.")
+    else:
+        bot.send_message(player_id, "Você já está jogando contra si mesmo!")
 
 # DILEMA DOS PRISIONEIROS
 @bot.message_handler(func=lambda message: True)
 def jogar_contra_cpu(message):
-    player_id = message.chat.id
+    player_id = message.from_user.id
 
-        
-    # Verifica se há jogadores disponíveis
-    if len(jogadores_disponiveis) < 2:
-        bot.send_message(player_id, "Não há jogadores disponíveis no momento. Tente novamente mais tarde.")
-        return
+    if player_id in players:
+        opponent_id = players[player_id]["opponent_id"]
+        if message.text.lower() in ["cooperar", "trair"]:
+            players[player_id]["decision"] = message.text.lower()
 
-    # Adicionar jogador à lista de jogadores disponíveis
-    for player_id in jogadores_disponiveis.keys():
-     if not jogadores_disponiveis[player_id]['jogando']:
-          jogadores_disponiveis.append(player_id)
-          bot.send_message(player_id, "Aguardando por outro jogador...")
-          return
-    
-    # Escolher oponente aleatório
-    if jogadores_disponiveis:
-          opponent_id = choice([pid for pid in jogadores_disponiveis if pid != player_id])
-    else:
-          bot.send_message(message.chat.id, "Não há jogadores disponíveis no momento.")
-    
-    # Iniciar o jogo entre o jogador e o oponente
-    player_decision = message.chat.id
-    iniciar_jogo(player_id, opponent_id, player_decision)
-    bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
+            if players[opponent_id]["decision"] is not None:
+                player_decision = players[player_id]["decision"]
+                opponent_decision = players[opponent_id]["decision"]
+                if player_decision == "cooperar" and opponent_decision == "cooperar":
+                    bot.send_message(player_id, "Ambos cooperaram. +2 pontos cada.")
+                    scores[player_id] += 2
+                    scores[opponent_id] += 2
+                elif player_decision == "cooperar" and opponent_decision == "trair":
+                    bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. +0 pontos para você, +3 pontos para seu oponente.")
+                    scores[opponent_id] += 3
+                elif player_decision == "trair" and opponent_decision == "cooperar":
+                    bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. +3 pontos para você, +0 pontos para seu oponente.")
+                    scores[player_id] += 3
+                elif player_decision == "trair" and opponent_decision == "trair":
+                    bot.send_message(player_id, "Ambos traíram. +1 ponto cada.")
+                    scores[player_id] += 1
+                    scores[opponent_id] += 1
+
+                bot.send_message(player_id, f"Sua escolha: {player_decision}")
+                bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
+                bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
+                bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
+                players.pop(player_id)
+            else:
+                bot.send_message(player_id, "Aguardando o oponente jogar...")
 
                
 # ENCERRANDO O JOGO
