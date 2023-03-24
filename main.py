@@ -1,6 +1,6 @@
 # %% Bibliotecas API e introdução
 
-from random import choice
+from random import choice, randint
 import telebot   
 from random import sample
 import sqlite3
@@ -85,9 +85,10 @@ def start_message(message):
         conn.commit()
         bot.reply_to(message, "Bem-vindo ao jogo!")
     else:
-        bot.reply_to(message, "Bem-vindo de volta!")
-    conn.close()        
+        jogador_nome = row[1]
+        bot.reply_to(message, "Bem-vindo de volta, " + jogador_nome + "!")
     bot.reply_to(message, "Olá, " + jogador_nome + "! Você está disponível para jogar!")
+    conn.close()        
             
     # Imprime o menu com a descrição do jogo
     welcome_message(message)
