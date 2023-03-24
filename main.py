@@ -4,7 +4,16 @@ from random import choice
 import telebot   
 from random import sample
 import sqlite3
+import threading
 
+# Create a SQLite connection pool with one connection per thread
+connection_pool = threading.local()
+
+def get_connection():
+    # Return the connection for the current thread, or create a new one
+    if not hasattr(connection_pool, 'connection'):
+        connection_pool.connection = sqlite3.connect('database.db')
+    return connection_pool.connection
     
 # Chave da API do Telegram
 CHAVE_API_TELEGRAM = "5570452334:AAHmIZApvbKb1wd8hSiOj6BKu6-TNMINd-8"
@@ -35,7 +44,7 @@ def help_message(message):
     describe_project(message)
     
 # Conectar ao banco de dados
-conn = sqlite3.connect("jogadores.db")
+conn = get_connection()
 c = conn.cursor()
 
 # Criação da tabela de jogadores

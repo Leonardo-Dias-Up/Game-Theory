@@ -33,3 +33,4 @@ urllib3==1.26.12
 virtualenv==20.13.2
 whitenoise==6.0.0
 db-sqlite3==0.0.1
+threaded==4.1.0
