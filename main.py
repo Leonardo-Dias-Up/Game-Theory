@@ -1,3 +1,5 @@
+# %% Bibliotecas API e introdução
+
 from random import choice
 import telebot   
 from random import sample
@@ -15,10 +17,12 @@ round_number = 0
 jogadores_disponiveis = {}
 
 # DESENVOLVEDORES DO BOT
-@bot.message_handler(commands=['help'])
 def describe_project(message):
     text = "Desenvolvedores: Leonardo Dias e Djalma. 2023"
     bot.send_message(message.chat.id, text)
+
+@bot.message_handler(commands=['help'])
+def help_message(message):
     describe_project(message)
     
 # BOAS VINDAS
@@ -32,10 +36,10 @@ def welcome_message(message):
 @bot.message_handler(commands=['start'])
 def start_message(message):
     welcome_message(message)
-    
-# JOGANDO CONTRA A CPU
+
+# %% JOGANDO CONTRA A CPU
 @bot.message_handler(commands=['cpu'])
-def jogar_so_mensagem(message):
+def jogar_cpu(message):
     player_id = message.from_user.id
 
     if player_id not in players:
@@ -43,13 +47,6 @@ def jogar_so_mensagem(message):
         scores[player_id] = 0
         bot.send_message(player_id, "Digite 'cooperar' ou 'trair' para fazer sua escolha.")
     else:
-        bot.send_message(player_id, "Você já está jogando contra si mesmo!")
-
-@bot.message_handler(func=lambda message: True)
-def jogar_contra_cpu(message):
-    player_id = message.from_user.id
-
-    if player_id in players:
         opponent_id = players[player_id]["opponent_id"]
         if message.text.lower() in ["cooperar", "trair"]:
             players[player_id]["decision"] = message.text.lower()
@@ -58,8 +55,7 @@ def jogar_contra_cpu(message):
                 player_decision = players[player_id]["decision"]
                 opponent_decision = choice(["cooperar", "trair"])
                 players[player_id]["opponent_decision"] = opponent_decision
-                #bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
-                #opponent_decision = players[opponent_id]["decision"]
+
                 if player_decision == "cooperar" and opponent_decision == "cooperar":
                     bot.send_message(player_id, "Ambos cooperaram. +2 pontos cada.")
                     scores[player_id] += 2
@@ -82,7 +78,8 @@ def jogar_contra_cpu(message):
                 players.pop(player_id)
             else:
                 bot.send_message(player_id, "Aguardando o oponente jogar...")
-               
+
+
 # ENCERRANDO O JOGO
 def fim_de_jogo(player_id, opponent_id):
     global players, scores, round_number
@@ -189,3 +186,4 @@ def pontuacao_message(message):
     
 if __name__ == "__main__":
     bot.polling()
+# %%
