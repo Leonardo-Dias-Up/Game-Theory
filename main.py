@@ -55,6 +55,8 @@ def jogar_contra_cpu(message):
             if players[opponent_id]["decision"] is not None:
                 player_decision = players[player_id]["decision"]
                 opponent_decision = choice(["cooperar", "trair"])
+                players[player_id]["opponent_decision"] = opponent_decision
+                #bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                 #opponent_decision = players[opponent_id]["decision"]
                 if player_decision == "cooperar" and opponent_decision == "cooperar":
                     bot.send_message(player_id, "Ambos cooperaram. +2 pontos cada.")
