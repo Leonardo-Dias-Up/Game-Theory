@@ -14,11 +14,23 @@ scores = {}
 round_number = 0
 jogadores_disponiveis = {}
 
+# DESENVOLVEDORES DO BOT
+@bot.message_handler(commands=['help'])
+def start_message(message):
+    bot.send_message(message, "Desenvolvedores: Leonardo Dias e Djalma. 2023")
+    
+# BOAS VINDAS
+def welcome_message(message):
+    text = "Bem-vindo ao jogo do dilema dos prisioneiros!\n\n" \
+           "O objetivo do jogo é maximizar sua pontuação ao cooperar ou trair seu oponente. Cada jogador deve escolher 'cooperar' ou 'trair'.\n\n" \
+           "Digite 'cooperar' ou 'trair' para jogar. Você pode jogar contra outros jogadores ou contra a máquina. Para jogar contra a máquina, digite /cpu. Para jogar contra outros jogadores, digite /multiplayer."
+    bot.send_message(message.chat.id, text)
+
 # INICIO JOGO
 @bot.message_handler(commands=['start'])
 def start_message(message):
-    bot.send_message(message, "Bem Vindo")
-
+    welcome_message(message)
+    
 # JOGANDO CONTRA A CPU
 @bot.message_handler(commands=['cpu'])
 def jogar_so_mensagem(message):
@@ -28,12 +40,15 @@ def jogar_so_mensagem(message):
         players[player_id] = {"name": message.chat.first_name, "decision": None, "opponent_id": player_id}
         scores[player_id] = 0
         bot.send_message(player_id, "Digite 'cooperar' ou 'trair' para fazer sua escolha.")
+        opponent_decision = choice(["cooperar", "trair"])
+        jogar_contra_cpu(message, opponent_decision)
+        
     else:
         bot.send_message(player_id, "Você já está jogando contra si mesmo!")
 
 # DILEMA DOS PRISIONEIROS
 @bot.message_handler(func=lambda message: True)
-def jogar_contra_cpu(message):
+def jogar_contra_cpu(message, opponent_decision):
     player_id = message.chat.id
 
     if player_id in players:
@@ -42,14 +57,7 @@ def jogar_contra_cpu(message):
             players[player_id]["decision"] = message.text.lower()
 
             if players[opponent_id]["decision"] is not None:
-                player_decision = players[player_id]["decision"]
-                
-                # Verifica se o oponente é um jogador humano ou a CPU
-                if opponent_id == player_id:
-                    opponent_decision = choice(["cooperar", "trair"])
-                else:
-                    opponent_decision = players[opponent_id]["decision"]
-                
+                player_decision = players[player_id]["decision"]             
                 if player_decision == "cooperar" and opponent_decision == "cooperar":
                     bot.send_message(player_id, "Ambos cooperaram. +2 pontos cada.")
                     scores[player_id] += 2
