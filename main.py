@@ -37,12 +37,36 @@ def jogar_so_mensagem(message):
     if player_id not in players:
         players[player_id] = {"name": message.from_user.first_name, "decision": None, "opponent_id": player_id}
         scores[player_id] = 0
-        bot.send_message(player_id, "Você está jogando contra si mesmo!")
-        opponent_decision = choice(["cooperar", "trair"])
-        players[player_id]["opponent_decision"] = opponent_decision
-        bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
+        bot.send_message(player_id, "Digite sua jogada: cooperar ou trair")
     else:
-        bot.send_message(player_id, "Você já está jogando contra outro jogador!")
+        bot.send_message(player_id, "Você já está jogando uma partida!")
+
+@bot.message_handler(func=lambda message: message.text.lower() in ['cooperar', 'trair'] and message.from_user.id in players)
+def jogada_usuario(message):
+    player_id = message.from_user.id
+    decision = message.text.lower()
+
+    players[player_id]["decision"] = decision
+
+    opponent_decision = choice(["cooperar", "trair"])
+    players[player_id]["opponent_decision"] = opponent_decision
+    bot.send_message(player_id, f"Você jogou: {decision}\nSeu oponente jogou: {opponent_decision}")
+
+    if decision == 'cooperar' and opponent_decision == 'cooperar':
+        scores[player_id] += 2
+        bot.send_message(player_id, "Ambos cooperaram. +2 pontos para você.")
+    elif decision == 'cooperar' and opponent_decision == 'trair':
+        scores[player_id] -= 1
+        bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. -1 ponto para você.")
+    elif decision == 'trair' and opponent_decision == 'cooperar':
+        scores[player_id] += 3
+        bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. +3 pontos para você.")
+    else:
+        scores[player_id] -= 2
+        bot.send_message(player_id, "Ambos traíram. -2 pontos para você.")
+    
+    bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
+
 
 def fim_de_jogo(player_id, opponent_id):
     global players, scores, round_number
