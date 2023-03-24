@@ -1,7 +1,9 @@
 from random import choice
 import telebot
 
-bot = telebot.TeleBot("YOUR_TELEGRAM_BOT_TOKEN")
+CHAVE_API_TELEGRAM = "5570452334:AAHmIZApvbKb1wd8hSiOj6BKu6-TNMINd-8"
+
+bot = telebot.TeleBot(CHAVE_API_TELEGRAM)
 
 class Player:
     def __init__(self, id, name):
