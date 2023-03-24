@@ -73,13 +73,13 @@ def welcome_message(message):
     
 # Handler para o comando /start
 @bot.message_handler(commands=['start'])
-@bot.message_handler(commands=['start'])
 def start_message(message):
     jogador_id = message.chat.id
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
     c.execute("SELECT * FROM jogadores WHERE id=?", (jogador_id,))
     row = c.fetchone()
+    jogador_nome = ""
     if row is None:
         c.execute("INSERT INTO jogadores (id, nome, disponivel) VALUES (?, ?, ?)", (jogador_id, message.chat.first_name, 'INICIO'))
         conn.commit()
@@ -92,6 +92,7 @@ def start_message(message):
             
     # Imprime o menu com a descrição do jogo
     welcome_message(message)
+
 
 # Handler para o comando /close
 @bot.message_handler(commands=['close'])
