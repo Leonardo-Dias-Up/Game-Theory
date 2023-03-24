@@ -39,8 +39,9 @@ def start_message(message):
 
 # %% JOGANDO CONTRA A CPU
 @bot.message_handler(commands=['cpu'])
-def jogar_so_mensagem(message):
-    player_id = message.from_user.id
+def jogar_cpu_ou_so_mensagem(message):
+    if message.text == '/cpu':
+        player_id = message.from_user.id
 
     if player_id not in players:
         players[player_id] = {"name": message.from_user.first_name, "decision": None, "opponent_id": player_id}
