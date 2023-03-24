@@ -10,7 +10,7 @@ import time
 import re
 from random import *
 
-CHAVE_API_TELEGRAM = "5663343558:AAFWje6EajTRVdZHdaYKJTYiF01PhMoFdfE"
+CHAVE_API_TELEGRAM = "5570452334:AAHmIZApvbKb1wd8hSiOj6BKu6-TNMINd-8"
 
 bot = telebot.TeleBot(CHAVE_API_TELEGRAM)
 
