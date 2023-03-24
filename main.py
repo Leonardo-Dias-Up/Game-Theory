@@ -48,7 +48,7 @@ def jogar_so_mensagem(message):
 
 # DILEMA DOS PRISIONEIROS
 @bot.message_handler(func=lambda message: True)
-def jogar_contra_cpu(message, opponent_decision):
+def jogar_contra_cpu(message):
     player_id = message.chat.id
 
     if player_id in players:
