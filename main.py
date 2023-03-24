@@ -65,7 +65,8 @@ def welcome_message(message):
     text = "Bem-vindo ao jogo do dilema dos prisioneiros!\n\n" \
            "O objetivo do jogo é maximizar sua pontuação ao cooperar ou trair seu oponente. Cada jogador deve escolher 'cooperar' ou 'trair'.\n\n" \
            "Digite 'cooperar' ou 'trair' para jogar. Você pode jogar contra outros jogadores ou contra a máquina. Para jogar contra a máquina, digite /cpu. Para jogar contra outros jogadores, digite /multiplayer." \
-            "Para jogar, você precisa estar disponível para uma partida. " \
+            "Para jogar, você precisa estar disponível para isso basta clicar em /register \
+            e seguir preencher seu nome para o jogo." \
             "Ao usar o comando /multiplayer, você será pareado com outro jogador " \
             "disponível no momento. Para ficar indisponível, use o comando /close."
             
@@ -257,7 +258,10 @@ def jogar_contra_cpu(message):
                    
         else:
             multiplayer_message(message) # chama a função multiplayer
-
+            jogar_multiplayer_mensagem(message)
+            jogar_contra_jogador(message)
+            add_player_to_game_room(player_id)
+            
 # Função para o fim do jogo
 def fim_de_jogo(player_id, opponent_id):
     global round_number, scores, players
