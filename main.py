@@ -66,7 +66,6 @@ def jogar_so_mensagem(message):
         else:
             bot.send_message(player_id, "Opção inválida, digite 'cooperar' ou 'trair' para jogar contra a CPU!")
 
-
 def fim_de_jogo(player_id, opponent_id):
     global players, scores, round_number
     round_number = 0
