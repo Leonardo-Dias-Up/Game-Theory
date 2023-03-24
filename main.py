@@ -70,17 +70,14 @@ def jogar_contra_cpu(message):
                 else:
                     bot.send_message(player_id, "Você e seu oponente traíram. Ninguém ganhou pontos.")
 
-                bot.send_message(player_id, f"Sua escolha: {player_decision}")
-                bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
+                #bot.send_message(player_id, f"Sua escolha: {player_decision}")
+                #bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                 bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
-                bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
+                bot.send_message(player_id, "Obrigado por jogar o Dilema do Prisioneiro, \n \
+                                  digite /cpu para jogar novamente contra o computador, \n \
+                                 /multiplayer para jogar contra uma pessoa ou digite qualquer outra coisa para sair.")
                 players.pop(player_id)
-            else:
-                bot.send_message(player_id, "Aguardando o oponente jogar...")
-        else:
-            bot.send_message(player_id, "Digite 'cooperar' ou 'trair' para fazer sua escolha.")
-    else:
-        bot.send_message(player_id, "Obrigado por jogar o Dilema do Prisioneiro, caso queira jogar novamente digite /start")
+                #bot.send_message(player_id, "Obrigado por jogar o Dilema do Prisioneiro, caso queira jogar novamente digite /start")
 
 # ENCERRANDO O JOGO
 def fim_de_jogo(player_id, opponent_id):
