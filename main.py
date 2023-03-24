@@ -85,7 +85,7 @@ def jogar_contra_cpu(message):
                     bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
                     players.pop(player_id)
         else:
-            bot.send_message(player_id, "Aguardando o oponente jogar...") #
+            multiplayer_message(message) #
 
 # ENCERRANDO O JOGO
 def fim_de_jogo(player_id, opponent_id):
