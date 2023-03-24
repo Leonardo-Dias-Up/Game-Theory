@@ -22,10 +22,10 @@ def start_message(message):
 # JOGANDO CONTRA A CPU
 @bot.message_handler(commands=['cpu'])
 def jogar_so_mensagem(message):
-    player_id = message.from_user.id
+    player_id = message.chat.id
 
     if player_id not in players:
-        players[player_id] = {"name": message.from_user.first_name, "decision": None, "opponent_id": player_id}
+        players[player_id] = {"name": message.chat.first_name, "decision": None, "opponent_id": player_id}
         scores[player_id] = 0
         bot.send_message(player_id, "Digite 'cooperar' ou 'trair' para fazer sua escolha.")
     else:
@@ -34,7 +34,7 @@ def jogar_so_mensagem(message):
 # DILEMA DOS PRISIONEIROS
 @bot.message_handler(func=lambda message: True)
 def jogar_contra_cpu(message):
-    player_id = message.from_user.id
+    player_id = message.chat.id
 
     if player_id in players:
         opponent_id = players[player_id]["opponent_id"]
