@@ -38,7 +38,7 @@ def start_message(message):
     welcome_message(message)
 
 # %% JOGANDO CONTRA A CPU
-@bot.message_handler(commands=['cpu'])
+@bot.message_handler(commands=['cpu'], func=lambda message: True)
 def jogar_cpu_ou_so_mensagem(message):
     player_id = message.from_user.id
 
