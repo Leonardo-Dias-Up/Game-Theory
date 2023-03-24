@@ -4,65 +4,84 @@ from random import choice
 import telebot   
 from random import sample
 
+# Chave da API do Telegram
 CHAVE_API_TELEGRAM = "5570452334:AAHmIZApvbKb1wd8hSiOj6BKu6-TNMINd-8"
 
+# Criação do objeto bot
 bot = telebot.TeleBot(CHAVE_API_TELEGRAM)
-
 user = bot.get_me()
 updates = bot.get_updates()
 
+# Dicionários para armazenar os jogadores e pontuações
 players = {}
 scores = {}
+
+# Contador de rodadas
 round_number = 0
+
+# Dicionário para armazenar os jogadores disponíveis para jogo multiplayer
 jogadores_disponiveis = {}
 
-# DESENVOLVEDORES DO BOT
+# Função que descreve os desenvolvedores do jogo
 def describe_project(message):
     text = "Desenvolvedores: Leonardo Dias e Djalma. 2023"
     bot.send_message(message.chat.id, text)
 
+# Handler para o comando /help
 @bot.message_handler(commands=['help'])
 def help_message(message):
     describe_project(message)
     
-# BOAS VINDAS
+# Mensagem de boas-vindas
 def welcome_message(message):
     text = "Bem-vindo ao jogo do dilema dos prisioneiros!\n\n" \
            "O objetivo do jogo é maximizar sua pontuação ao cooperar ou trair seu oponente. Cada jogador deve escolher 'cooperar' ou 'trair'.\n\n" \
            "Digite 'cooperar' ou 'trair' para jogar. Você pode jogar contra outros jogadores ou contra a máquina. Para jogar contra a máquina, digite /cpu. Para jogar contra outros jogadores, digite /multiplayer."
     bot.send_message(message.chat.id, text)
     
-# INICIO JOGO
+# Handler para o comando /start
 @bot.message_handler(commands=['start'])
 def start_message(message):
     welcome_message(message)
 
-# %% JOGANDO CONTRA A CPU
+# Handler para o comando /cpu
 @bot.message_handler(commands=['cpu'])
 def jogar_cpu_ou_so_mensagem(message):
     if message.text == '/cpu':
         player_id = message.from_user.id
 
     if player_id not in players:
+         
+        # Handler para o comando /cpu
         players[player_id] = {"name": message.from_user.first_name, "decision": None, "opponent_id": player_id}
+        
+        # Inicializa a pontuação do jogador em 0
         scores[player_id] = 0
+        
+        # Envia mensagem para o jogador escolher sua jogada
         bot.send_message(player_id, "Digite 'cooperar' ou 'trair' para fazer sua escolha.")
     else:
         bot.send_message(player_id, "Você já está jogando contra si mesmo!")
 
+# Envia mensagem para o jogador escolher sua jogada
 @bot.message_handler(func=lambda message: True)
 def jogar_contra_cpu(message):
     player_id = message.from_user.id
 
-     # Jogando o oponente
+    # Envia mensagem para o jogador escolher sua jogada
     if player_id in players:
         opponent_id = players[player_id]["opponent_id"]
         if message.text.lower() in ["cooperar", "trair"]:
             players[player_id]["decision"] = message.text.lower()
 
+            # Verifica se a jogada do oponente já foi feita
             if players[opponent_id]["decision"] is not None:
                 player_decision = players[player_id]["decision"]
+                
+                # Verifica se a jogada do oponente já foi feita
                 opponent_decision = choice(["cooperar", "trair"])
+                
+                # Armazena a jogada do oponente no dicionário de jogadores
                 players[player_id]["opponent_decision"] = opponent_decision
                 bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                 
@@ -78,7 +97,8 @@ def jogar_contra_cpu(message):
                     bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 3 pontos!")
                 else:
                     bot.send_message(player_id, "Você e seu oponente traíram. Ninguém ganhou pontos.")
-
+                    
+                    # Respostas das escolhas tomadas pelos jogadores
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
@@ -87,7 +107,7 @@ def jogar_contra_cpu(message):
         else:
             multiplayer_message(message) # chama a função multiplayer
 
-# ENCERRANDO O JOGO
+# Encerramento do jogo 
 def fim_de_jogo(player_id, opponent_id):
     global players, scores, round_number
     round_number = 0
@@ -109,10 +129,11 @@ def fim_de_jogo(player_id, opponent_id):
     scores.pop(player_id)
     scores.pop(opponent_id)
 
-# INICINANDO O JOGO MULTIPLAYER
+# Inicio do jogo 
 def iniciar_jogo(player_id, opponent_id, player_decision):
     global round_number
     
+    # Verifica se a jogada do oponente já foi feita
     opponent_decision = players[opponent_id]["decision"]
     
     # Verificar as decisões de ambos os jogadores
@@ -151,8 +172,10 @@ def iniciar_jogo(player_id, opponent_id, player_decision):
     if round_number >= 5:
         fim_de_jogo(player_id, opponent_id)
 
-# Comando /multiplayer
+# Handler para o comando /multiplayer
 @bot.message_handler(commands=['multiplayer'])
+
+# Inicio do jogo para multiplayer
 def multiplayer_message(message):
     jogador1 = None
     if len(jogadores_disponiveis) < 2:
@@ -184,6 +207,7 @@ def multiplayer_message(message):
         if jogador2 in jogadores_disponiveis:
             jogadores_disponiveis.remove(jogador2)
 
+# Handler para o comando /pontuacao
 @bot.message_handler(commands=['pontuacao'])
 def pontuacao_message(message):
     text = "Pontuações:\n\n"
@@ -195,4 +219,3 @@ def pontuacao_message(message):
     
 if __name__ == "__main__":
     bot.polling()
-# %%
