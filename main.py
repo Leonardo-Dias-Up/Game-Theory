@@ -47,7 +47,7 @@ def jogar_cpu_ou_so_mensagem(message):
         scores[player_id] = 0
         bot.send_message(player_id, "Digite 'cooperar' ou 'trair' para fazer sua escolha.")
     else:
-        if message.text.lower() in ["cooperar", "trair"]:
+        if "text" in message and message.text.lower() in ["cooperar", "trair"]:
             players[player_id]["decision"] = message.text.lower()
             opponent_id = players[player_id]["opponent_id"]
             player_decision = players[player_id]["decision"]
@@ -73,6 +73,8 @@ def jogar_cpu_ou_so_mensagem(message):
             bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
             bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
             players.pop(player_id)
+        elif "text" in message:
+            bot.send_message(player_id, "Entrada inválida. Digite 'cooperar' ou 'trair'.")
         else:
             bot.send_message(player_id, "Você já está jogando contra si mesmo!")
 
