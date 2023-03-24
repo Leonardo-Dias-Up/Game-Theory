@@ -63,7 +63,10 @@ def jogar_contra_cpu(message):
           return
     
     # Escolher oponente aleatório
-    opponent_id = random.choice([pid for pid in jogadores_disponiveis if pid != player_id])
+    if jogadores_disponiveis:
+          opponent_id = random.choice([pid for pid in jogadores_disponiveis if pid != player_id])
+    else:
+          bot.send_message(message.chat.id, "Não há jogadores disponíveis no momento.")
     
     # Iniciar o jogo entre o jogador e o oponente
     iniciar_jogo(player_id, opponent_id, player_decision)
