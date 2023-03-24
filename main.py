@@ -53,7 +53,12 @@ def jogar_so_mensagem(message):
 # DILEMA DOS PRISIONEIROS
 @bot.message_handler(func=lambda message: True)
 def jogar_contra_cpu(message):
-    player_id = message.from_user.id
+    player_id = message.chat.id
+
+    # Verifica se há jogadores disponíveis
+    if len(jogadores_disponiveis) < 2:
+        bot.send_message(player_id, "Não há jogadores disponíveis no momento. Tente novamente mais tarde.")
+        return
 
     # Adicionar jogador à lista de jogadores disponíveis
     for player_id in jogadores_disponiveis.keys():
