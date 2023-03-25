@@ -78,35 +78,35 @@ def jogar_contra_cpu(message):
                 
                # Verificar as decisões de ambos os jogadores
                 if player_decision == "cooperar" and opponent_decision == "cooperar":
-                    scores[player_id] += 2
+                    scores[player_id] += 5
                     
                     # Respostas das escolhas tomadas pelos jogadores
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
-                    bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam 2 pontos!")
+                    bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam 5 pontos!")
                     bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
                     players.pop(player_id)
                     
                 elif player_decision == "cooperar" and opponent_decision == "trair":
-                    scores[player_id] -= 1
+                    scores[player_id] -= 10
                     
                     # Respostas das escolhas tomadas pelos jogadores
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
-                    bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu 1 ponto!")
+                    bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu -10 ponto!")
                     bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
                     players.pop(player_id)
                     
                 elif player_decision == "trair" and opponent_decision == "cooperar":
-                    scores[player_id] += 3
+                    scores[player_id] += 10
 
                     # Respostas das escolhas tomadas pelos jogadores
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
-                    bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 3 pontos!")
+                    bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 10 pontos!")
                     bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
                     players.pop(player_id)
                     
@@ -115,13 +115,13 @@ def jogar_contra_cpu(message):
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
-                    bot.send_message(player_id, "Você e seu oponente traíram. Ninguém ganhou pontos.")
+                    bot.send_message(player_id, "Você e seu oponente traíram. Você ganhou 1 pontos!")
                     bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
                     players.pop(player_id)
                    
         else:
-            bot.send_message("Obrigado por Jogar")
+            bot.send_message(player_id, "Obrigado por Jogar")
 
-   
+
 if __name__ == "__main__":
     bot.polling()
