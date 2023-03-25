@@ -184,11 +184,13 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS users
 def start(message):
     chat_id = message.chat.id
     
-    # Ask the user for their name
+    # Pergunta o nome para salvar
     bot.reply_to(message, "Olá! Qual o seu nome?")
-    # Cria um handler para a próxima mensagem do usuário, que irá tratar o nome
-    bot.register_next_step_handler(message)
     
+    # Cria um handler para a próxima mensagem do usuário, que irá tratar o nome
+    bot.register_next_step_handler(message, save_name, chat_id)
+    
+def save_name(message, chat_id):
     name = message.text
     
     conn = sqlite3.connect('database.db')
@@ -197,11 +199,9 @@ def start(message):
     try:
         cursor.execute("SELECT name FROM users WHERE id = ?", (chat_id,))
         row = cursor.fetchone()
-        if row:
-            name = row[0]
-        else:
-            cursor.execute("INSERT INTO users (id, name, is_available) VALUES (?, ?, ?)", (chat_id, name, 0))
-            cursor.connection.commit()
+        name = row[0] if row else 'unknown'
+        cursor.execute("INSERT INTO users (id, name, is_available) VALUES (?, ?, ?)", (chat_id, name, 0))
+        cursor.connection.commit()
     except Exception as e:
         print(e)
     finally:
@@ -209,6 +209,7 @@ def start(message):
         conn.close()
 
     bot.reply_to(message, f"Seja bem vindo {name} ao jogo Dilema dos Prisioneiros!")
+
 
 
 # set_available command
