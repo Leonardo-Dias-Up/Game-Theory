@@ -112,7 +112,6 @@ def jogada(message):
         if player_decision == "c" and opponent_decision == "t":
             scores[player_id] += 5
             scores[opponent_id] += 5
-            games[player_id]["draws"] += 1
             acumulated_scores[player_id] += 5
             if opponent_id is not None:
                 acumulated_scores[opponent_id] += 5
@@ -123,7 +122,6 @@ def jogada(message):
         elif player_decision == "c" and opponent_decision == "t":
             scores[player_id] -= 10
             scores[opponent_id] += 10
-            games[player_id]["losses"] += 1
             acumulated_scores[player_id]  -= 10
             if opponent_id is not None:
                 acumulated_scores[opponent_id] += 10
@@ -134,7 +132,6 @@ def jogada(message):
         elif player_decision == "t" and opponent_decision == "c":
             scores[player_id] += 10
             scores[opponent_id] -= 10
-            games[player_id]["wins"] += 1
             acumulated_scores[player_id]  += 10
             if opponent_id is not None:
                 acumulated_scores[opponent_id] -= 10
@@ -146,7 +143,6 @@ def jogada(message):
             bot.send_message(player_id, "Você e seu oponente traíram. Vocês ganharam 1 ponto cada!")
             scores[player_id] += 1
             scores[opponent_id] += 1
-            games[player_id]["draws"] += 1
             acumulated_scores[player_id]  += 1
             if opponent_id is not None:
                 acumulated_scores[opponent_id] += 1
