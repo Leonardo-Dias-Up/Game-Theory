@@ -163,16 +163,85 @@ def jogada(message):
         # Envia mensagem para o oponente fazer sua jogada
         bot.send_message(opponent_id, f"O seu oponente jogou: {message.text.lower()}\nAgora é a sua vez de jogar!")
 
-# Comando para listar usuários online
-@bot.message_handler(commands=["online"])
-def list_online_users(message):
-    response = "Usuários online:\n"
-    members_count = bot.get_chat_members_count(message.chat.id)
-    for member in bot.get_chat_members(message.chat.id, limit=members_count):
-        if member.user.is_bot:
-            continue
-        response += f"- {member.user.first_name}\n"
-    bot.send_message(message.chat.id, response)
+# %%
+import sqlite3
+
+# SQLite connection
+conn = sqlite3.connect('database.db')
+cursor = conn.cursor()
+
+# Create table
+cursor.execute('''CREATE TABLE IF NOT EXISTS users
+                (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                is_available BOOLEAN DEFAULT 0)''')
+
+
+# Handler for /start command
+@bot.message_handler(commands=['start'])
+def start(message):
+    chat_id = message.chat.id
+    first_name = message.chat.first_name
+
+    # Check if user already exists in database
+    cursor.execute("SELECT * FROM users WHERE id = ?", (chat_id,))
+    user = cursor.fetchone()
+
+    if not user:
+        # If user doesn't exist, insert new record into database
+        cursor.execute("INSERT INTO users (id, name) VALUES (?, ?)", (chat_id, first_name))
+        conn.commit()
+
+    # Send welcome message
+    bot.send_message(chat_id, f"Olá, {first_name}! Use os comandos para gerenciar sua disponibilidade.")
+
+
+# Handler for /disponivel command
+@bot.message_handler(commands=['disponivel'])
+def set_available(message):
+    chat_id = message.chat.id
+
+    # Update user availability
+    cursor.execute("UPDATE users SET is_available = ? WHERE id = ?", (True, chat_id))
+    conn.commit()
+
+    # Send confirmation message
+    bot.send_message(chat_id, "Sua disponibilidade foi atualizada para 'disponível'.")
+
+
+# Handler for /indisponivel command
+@bot.message_handler(commands=['indisponivel'])
+def set_unavailable(message):
+    chat_id = message.chat.id
+
+    # Update user availability
+    cursor.execute("UPDATE users SET is_available = ? WHERE id = ?", (False, chat_id))
+    conn.commit()
+
+    # Send confirmation message
+    bot.send_message(chat_id, "Sua disponibilidade foi atualizada para 'indisponível'.")
+
+
+# Handler for /listar command
+@bot.message_handler(commands=['listar'])
+def list_users(message):
+    chat_id = message.chat.id
+
+    # Get list of all users and their availability
+    cursor.execute("SELECT name, is_available FROM users")
+    users = cursor.fetchall()
+
+    if not users:
+        bot.send_message(chat_id, "Nenhum usuário cadastrado.")
+    else:
+        # Format list of users as a string
+        users_str = ""
+        for user in users:
+            status = "Disponível" if user[1] else "Indisponível"
+            users_str += f"{user[0]} - {status}\n"
+
+        # Send list of users as a message
+        bot.send_message(chat_id, users_str)
     
 if __name__ == "__main__":
     bot.polling()
