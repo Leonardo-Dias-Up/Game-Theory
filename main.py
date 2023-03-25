@@ -116,7 +116,7 @@ def jogada(message):
             if opponent_id in acumulated_scores:
                 acumulated_scores[opponent_id] += scores[opponent_id][0]
             else:
-                acumulated_scores[opponent_id] = scores[opponent_id][0]
+                acumulated_scores[opponent_id] += scores[opponent_id][0]
             bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam" + f" {scores[player_id]} pontos!")
         
         elif player_decision == "c" and opponent_decision == "t":
@@ -126,7 +126,7 @@ def jogada(message):
             if opponent_id in acumulated_scores:
                 acumulated_scores[opponent_id] += scores[opponent_id][0]
             else:
-                acumulated_scores[opponent_id] = scores[opponent_id][0]
+                acumulated_scores[opponent_id] += scores[opponent_id][0]
             bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu" + f" {scores[player_id]} pontos!")
         
         elif player_decision == "t" and opponent_decision == "c":
