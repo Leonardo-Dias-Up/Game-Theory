@@ -1,5 +1,4 @@
 # %% Bibliotecas API e introdução
-from django.conf import settings
 from random import choice, randint
 import telebot   
 from random import sample
