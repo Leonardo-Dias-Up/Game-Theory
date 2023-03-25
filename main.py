@@ -15,6 +15,7 @@ updates = bot.get_updates()
 # Dicionários para armazenar os jogadores e pontuações
 players = {}
 scores = {}
+games = {}
 
 # Contador de rodadas
 round_number = 0
@@ -64,8 +65,12 @@ def jogar_pvp(message):
     
     global opponent_decision 
     
-    opponent_id = players.get(player_id, {}).get("opponent_id")
-    opponent_decision = players.get(opponent_id, {}).get("decision")
+    try:
+        opponent_id = players[player_id]["opponent_id"]
+        opponent_decision = players[opponent_id]["decision"]
+    except KeyError:
+        bot.reply_to(message, "Você ainda não iniciou um jogo ou seu oponente ainda não fez sua jogada.")
+        return
        
     player_id = message.from_user.id
     
@@ -82,6 +87,14 @@ def jogada(message):
     
     global opponent_id
     
+    players[player_id]["decision"] = None
+    players[opponent_id]["decision"] = None
+    
+    if games.get(player_id) is None:
+        games[player_id] = {"wins": 0, "losses": 0, "draws": 0}
+    if games.get(opponent_id) is None:
+        games[opponent_id] = {"wins": 0, "losses": 0, "draws": 0}
+        
     # Armazena a escolha do jogador no dicionário de jogadores
     players[player_id]["decision"] = message.text.lower()
     
@@ -102,6 +115,8 @@ def jogada(message):
         if player_decision == "c" and opponent_decision == "t":
             scores[player_id] += 5
             scores[opponent_id] += 5
+            games[player_id]["draws"] += 1
+            games[opponent_id]["draws"] += 1
             bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam 5 pontos!")
         
         elif player_decision == "c" and opponent_decision == "t":
@@ -112,45 +127,26 @@ def jogada(message):
         elif player_decision == "t" and opponent_decision == "c":
             scores[player_id] += 10
             scores[opponent_id] -= 10
+            games[player_id]["losses"] += 1
+            games[opponent_id]["wins"] += 1
             bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 10 pontos!")
         
         else:
             bot.send_message(player_id, "Você e seu oponente traíram. Vocês ganharam 1 ponto cada!")
             scores[player_id] += 1
             scores[opponent_id] += 1
+            games[player_id]["draws"] += 1
+            games[opponent_id]["draws"] += 1
             
         # Envia mensagem com as pontuações atuais dos jogadores e remove os jogadores do dicionário de jogadores
         bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}\nPontuação do oponente: {scores[opponent_id]}")
-        bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
+        bot.send_message(player_id, "Digite /pvp para jogar novamente contra um jogador ou /cpu para jogar contra o computador ou digite qualquer outra coisa para sair.")
         players.pop(player_id)
         players.pop(opponent_id)
 
     else:
         # Envia mensagem para o oponente fazer sua jogada
         bot.send_message(opponent_id, f"O seu oponente jogou: {message.text.lower()}\nAgora é a sua vez de jogar!")
-
-    # Envia mensagem com as pontuações atuais dos jogadores
-    bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}\nPontuação do oponente: {scores[opponent_id]}")
-
-    # Pergunta se o jogador deseja jogar novamente
-    keyboard = telebot.types.InlineKeyboardMarkup()
-    keyboard.row(
-        telebot.types.InlineKeyboardButton('Sim', callback_data='sim'),
-        telebot.types.InlineKeyboardButton('Não', callback_data='nao')
-    )
-    bot.send_message(player_id, 'Deseja jogar novamente?', reply_markup=keyboard)
-        
-@bot.callback_query_handler(func=lambda call: True)
-def callback_handler(call):
-    player_id = call.from_user.id
-    
-    if call.data == 'sim':
-        bot.send_message(player_id, 'Ok, vamos jogar novamente!')
-        
-        if players[player_id]["opponent_id"] == player_id:
-            jogar_contra_cpu(call.message)
-        else:
-            bot.send_message(player_id, 'Aguarde até que seu oponente jogue!')
 
 if __name__ == "__main__":
     bot.polling()
