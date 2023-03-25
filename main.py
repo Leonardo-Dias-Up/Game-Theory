@@ -87,9 +87,6 @@ def jogada(message):
     
     global opponent_id
     
-    players[player_id]["decision"] = None
-    players[opponent_id]["decision"] = None
-    
     if games.get(player_id) is None:
         games[player_id] = {"wins": 0, "losses": 0, "draws": 0}
     if games.get(opponent_id) is None:
