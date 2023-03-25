@@ -191,7 +191,7 @@ def start(message):
         cursor.execute("SELECT name FROM users WHERE id = ?", (chat_id,))
         row = cursor.fetchone()
         name = row[0] if row else 'unknown'
-        cursor.execute("INSERT OR IGNORE INTO users (id, name, available) VALUES (?, ?, ?)", (chat_id, name, 0))
+        cursor.execute("INSERT OR IGNORE INTO users (id, name, is_available) VALUES (?, ?, ?)", (chat_id, name, 0))
         cursor.connection.commit()
     except Exception as e:
         print(e)
@@ -205,11 +205,27 @@ def start(message):
 @bot.message_handler(commands=['set_available'])
 def set_available(message):
     chat_id = message.chat.id
+    
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("UPDATE users SET is_available = ? WHERE id = ?", (1, chat_id))
+        cursor.connection.commit()
+        bot.reply_to(message, "Você está disponível agora!")
+    except Exception as e:
+        print(e)
+        bot.reply_to(message, "Ocorreu um erro ao tentar atualizar sua disponibilidade. Tente novamente mais tarde.")
+    finally:
+        cursor.close()
+        conn.close()
+
 
 # get_users command
 @bot.message_handler(commands=['get_users'])
 def get_users(message):
-
+    chat_id = message.chat.id
+    
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     
@@ -230,7 +246,7 @@ def get_users(message):
     
     try:
         # update user availability
-        cursor.execute("UPDATE users SET available = ? WHERE id = ?", (1, chat_id))
+        cursor.execute("UPDATE users SET is_available = ? WHERE id = ?", (1, chat_id))
         conn.commit()
     except Exception as e:
         print(e)
@@ -250,7 +266,7 @@ def set_unavailable(message):
 
     try:
         # update user availability
-        cursor.execute("UPDATE users SET available = ? WHERE id = ?", (0, chat_id))
+        cursor.execute("UPDATE users SET is_available = ? WHERE id = ?", (0, chat_id))
         conn.commit()
     except Exception as e:
         print(e)
