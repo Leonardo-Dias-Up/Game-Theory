@@ -1,6 +1,6 @@
 # %% Bibliotecas API e introdução
 
-from random import choice
+from random import choice, randint
 import telebot   
 from random import sample
 
@@ -106,30 +106,28 @@ def jogada(message):
             opponent_decision = players[opponent_id]["decision"]
         else:
             opponent_decision = choice(["c", "t"])
+            opponent_id = randint(1000000000, 9999999999)  # Gera um id aleatório
         
         # Calcula a pontuação dos jogadores e atualiza o dicionário de pontuações
         if player_decision == "c" and opponent_decision == "c":
             scores[player_id] = [5]
             scores[opponent_id] = [5]
             acumulated_scores[player_id] = acumulated_scores[player_id] + scores[player_id][0] / 2
-            if opponent_id is not None and scores.get(opponent_id) is not None:
-                acumulated_scores[opponent_id] = acumulated_scores[opponent_id] + scores[opponent_id][0] / 2
+            acumulated_scores[opponent_id] = acumulated_scores[opponent_id] + scores[opponent_id][0] / 2
             bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam" + f" {scores[player_id]} pontos!")
         
         elif player_decision == "c" and opponent_decision == "t":
             scores[player_id] = [-10]
             scores[opponent_id] = [10]
             acumulated_scores[player_id] = acumulated_scores[player_id] + scores[player_id][0] / 2
-            if opponent_id is not None and scores.get(opponent_id) is not None:
-                acumulated_scores[opponent_id] = acumulated_scores[opponent_id] + scores[opponent_id][0] / 2
+            acumulated_scores[opponent_id] = acumulated_scores[opponent_id] + scores[opponent_id][0] / 2
             bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu" + f" {scores[player_id]} pontos!")
         
         elif player_decision == "t" and opponent_decision == "c":
             scores[player_id] = [10]
             scores[opponent_id] = [-10]
             acumulated_scores[player_id] = acumulated_scores[player_id] + scores[player_id][0] / 2
-            if opponent_id is not None and scores.get(opponent_id) is not None:
-                acumulated_scores[opponent_id] = acumulated_scores[opponent_id] + scores[opponent_id][0] / 2
+            acumulated_scores[opponent_id] = acumulated_scores[opponent_id] + scores[opponent_id][0] / 2
             bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou" + f" {scores[player_id]} pontos!")
         
         else:
@@ -137,8 +135,7 @@ def jogada(message):
             scores[player_id] = [1]
             scores[opponent_id] = [1]
             acumulated_scores[player_id] = acumulated_scores[player_id] + scores[player_id][0] / 2
-            if opponent_id is not None and scores.get(opponent_id) is not None:
-                acumulated_scores[opponent_id] = acumulated_scores[opponent_id] + scores[opponent_id][0] / 2
+            acumulated_scores[opponent_id] = acumulated_scores[opponent_id] + scores[opponent_id][0] / 2
             
         # Envia mensagem com as pontuações atuais dos jogadores e remove os jogadores do dicionário de jogadores
         bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}\nPontuação do oponente: {scores[opponent_id]}")
