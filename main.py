@@ -53,7 +53,6 @@ conn.commit()
 def buscar_jogadores_disponiveis():
     c.execute("SELECT id, nome, sobrenome FROM jogadores WHERE disponivel = 1")
     jogadores = c.fetchall()
-    bot.send_message(jogadores)
     return jogadores
 
 # Função para atualizar o status de disponibilidade do jogador no banco de dados
@@ -223,7 +222,7 @@ def jogar_contra_cpu(message):
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
-                    bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam 2 pontos!")
+                    bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam 1 pontos!")
                     bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou /close para finalizar, caso queria jogar pvp /multiplayer ou /start.")
                     players.pop(player_id)
                     
@@ -234,7 +233,7 @@ def jogar_contra_cpu(message):
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
-                    bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu 1 ponto!")
+                    bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu -10 ponto!")
                     bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou /close para finalizar, caso queria jogar pvp /multiplayer ou /start.")
                     players.pop(player_id)
                     
@@ -245,7 +244,7 @@ def jogar_contra_cpu(message):
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
-                    bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 3 pontos!")
+                    bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 10 pontos!")
                     bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou /close para finalizar, caso queria jogar pvp /multiplayer ou /start.")
                     players.pop(player_id)
                     
@@ -254,15 +253,12 @@ def jogar_contra_cpu(message):
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
-                    bot.send_message(player_id, "Você e seu oponente traíram. Ninguém ganhou pontos.")
+                    bot.send_message(player_id, "Você e seu oponente traíram. Você ganhou 1 pontos!")
                     bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou /close para finalizar, caso queria jogar pvp /multiplayer ou /start.")
                     players.pop(player_id)
                    
         else:
             multiplayer_message(message) # chama a função multiplayer
-            jogar_multiplayer_mensagem(message)
-            jogar_contra_jogador(message)
-            add_player_to_game_room(player_id)
             
 # Função para o fim do jogo
 def fim_de_jogo(player_id, opponent_id):
@@ -289,15 +285,15 @@ def iniciar_jogo(player_id, opponent_id, player_decision):
     # Verificar as decisões de ambos os jogadores
     if player_decision == "cooperar" and opponent_decision == "cooperar":
          scores[player_id] += 2
-         bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam 2 pontos!")
+         bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam 1 pontos!")
     elif player_decision == "cooperar" and opponent_decision == "trair":
          scores[player_id] -= 1
-         bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu 1 ponto!")
+         bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu -10 ponto!")
     elif player_decision == "trair" and opponent_decision == "cooperar":
          scores[player_id] += 3
-         bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 3 pontos!")
+         bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 10 pontos!")
     else:
-         bot.send_message(player_id, "Você e seu oponente traíram. Ninguém ganhou pontos.")
+         bot.send_message(player_id, "Você e seu oponente traíram. Ninguém ganhou pontos. Você ganhou 5 pontos!")
     
     # Incrementar o número de rodadas
     round_number += 1
@@ -341,27 +337,6 @@ def iniciar_rodada(player_id, opponent_id):
     
     # Iniciar a jogada
     iniciar_jogo(player_id, opponent_id, player_decision)
-
-def multiplayer_matchmaking(message):
-    # Busca por jogadores disponíveis no banco de dados
-    jogadores_disponiveis = buscar_jogadores_disponiveis()
-
-    # Seleciona dois jogadores aleatórios da lista de jogadores disponíveis
-    if len(jogadores_disponiveis) >= 2:
-        jogador_1, jogador_2 = sample(jogadores_disponiveis, 2)
-        jogador_1_id, jogador_1_nome, jogador_1_sobrenome = jogador_1
-        jogador_2_id, jogador_2_nome, jogador_2_sobrenome = jogador_2
-
-        # Atualiza o status de disponibilidade dos jogadores no banco de dados
-        atualizar_disponibilidade_jogador(jogador_1_id, 0)
-        atualizar_disponibilidade_jogador(jogador_2_id, 0)
-
-        # Envia uma mensagem aos jogadores informando que foram pareados e iniciando a partida
-        bot.send_message(jogador_1_id, f"Você foi pareado com {jogador_2_nome} {jogador_2_sobrenome}. A partida começou!")
-        bot.send_message(jogador_2_id, f"Você foi pareado com {jogador_1_nome} {jogador_1_sobrenome}. A partida começou!")
-    else:
-        bot.send_message(message.chat.id, "Desculpe, não há jogadores suficientes disponíveis para jogar multiplayer no momento. Tente novamente mais tarde.")
-
 
 # Define um dicionário para armazenar as salas de jogo
 game_rooms = {}
