@@ -137,6 +137,7 @@ def register_message(message):
     else:
         bot.reply_to(message, "Você já está cadastrado. Use o comando /disponivel para ficar disponível para jogar.")
     conn.close()
+    buscar_jogadores_disponiveis()
 
 # Lista de jogadores aguardando cadastro
 jogadores_aguardando_cadastro = []
