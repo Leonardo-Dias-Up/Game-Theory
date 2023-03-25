@@ -62,6 +62,7 @@ def jogar_contra_cpu(message):
 # Handler para o comando /pvp
 @bot.message_handler(commands=['pvp'])
 def jogar_pvp(message):
+    player_id = message.from_user.id
     
     global opponent_decision 
     
@@ -182,7 +183,10 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS users
 @bot.message_handler(commands=['begin'])
 def start(message):
     chat_id = message.chat.id
-    name = message.chat.first_name
+    
+    # Pergunta o nome para salvar
+    bot.reply_to(message, "Olá! Qual o seu nome?")
+    name = message.text
     
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
@@ -199,7 +203,7 @@ def start(message):
         cursor.close()
         conn.close()
 
-    bot.reply_to(message, f"Olá {name}, bem-vindo(a) ao bot!")
+    bot.reply_to(message, f"Seja bem vindo {name} ao jogo Dilema dos Prisioneiros!")
 
 # set_available command
 @bot.message_handler(commands=['set_available'])
