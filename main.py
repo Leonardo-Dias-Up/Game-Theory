@@ -153,8 +153,11 @@ def jogada(message):
         bot.send_message(player_id, f"Sua pontuação acumulada: {acumulated_scores[player_id]}\nPontuação do oponente: {acumulated_scores[opponent_id]}")
         bot.send_message(player_id, "Digite /pvp para jogar novamente contra um jogador ou /cpu para jogar contra o computador ou digite qualquer outra coisa para sair.")
         players.pop(player_id)
-        players.pop(opponent_id)
-
+        
+        try:
+            players.pop(opponent_id)
+        except:
+            pass
     else:
         # Envia mensagem para o oponente fazer sua jogada
         bot.send_message(opponent_id, f"O seu oponente jogou: {message.text.lower()}\nAgora é a sua vez de jogar!")
