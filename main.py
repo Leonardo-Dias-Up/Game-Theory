@@ -184,10 +184,10 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS users
 def start(message):
     chat_id = message.chat.id
     
-    # Pergunta o nome para salvar
+    # Ask the user for their name
     bot.reply_to(message, "Olá! Qual o seu nome?")
     
-    # Cria um handler para a próxima mensagem do usuário, que irá tratar o nome
+    # Register a handler for the next message from the user, which will handle the name
     bot.register_next_step_handler(message, save_name, chat_id)
     
 def save_name(message, chat_id):
@@ -197,9 +197,6 @@ def save_name(message, chat_id):
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SELECT name FROM users WHERE id = ?", (chat_id,))
-        row = cursor.fetchone()
-        name = row[0] if row else 'unknown'
         cursor.execute("INSERT INTO users (id, name, is_available) VALUES (?, ?, ?)", (chat_id, name, 0))
         cursor.connection.commit()
     except Exception as e:
@@ -209,6 +206,7 @@ def save_name(message, chat_id):
         conn.close()
 
     bot.reply_to(message, f"Seja bem vindo {name} ao jogo Dilema dos Prisioneiros!")
+
 
 
 
