@@ -1,5 +1,5 @@
 # %% Bibliotecas API e introdução
-
+from django.conf import settings
 from random import choice, randint
 import telebot   
 from random import sample
@@ -59,7 +59,53 @@ def buscar_jogadores_disponiveis():
 def atualizar_disponibilidade_jogador(jogador_id, disponivel):
     c.execute("UPDATE jogadores SET disponivel = ? WHERE id = ?", (disponivel, jogador_id))
     conn.commit()
+
+# Handler para o comando /list_users
+@bot.message_handler(commands=['list_users'])
+# Função para listar jogadores disponíveis
+def list_users(update, context):
+    # Busca jogadores disponíveis no banco de dados
+    jogadores = buscar_jogadores_disponiveis()
     
+    # Cria uma lista com o nome e sobrenome dos jogadores
+    lista_jogadores = []
+    for jogador in jogadores:
+        lista_jogadores.append(f'{jogador[1]} {jogador[2]}')
+    
+    # Verifica se há jogadores disponíveis
+    if len(lista_jogadores) == 0:
+        message = "Não há jogadores disponíveis no momento."
+    else:
+        message = "Jogadores disponíveis:\n\n"
+        message += "\n".join(lista_jogadores)
+    
+    # Envia a mensagem ao usuário
+    context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+    
+# loop que verifica as atualizações de mensagens
+@bot.message_handler(func=lambda message: True)
+def handle_all_messages(message):
+    # código para processar todas as mensagens recebidas
+    # aqui você pode incluir a busca por jogadores disponíveis e atualização do status de disponibilidade
+
+    # exemplo de como atualizar o status de disponibilidade de um jogador
+    # atualiza o status para disponível quando o jogador envia a mensagem "disponível"
+    if message.text == "disponível":
+        atualizar_disponibilidade_jogador(message.chat.id, 1)
+        bot.reply_to(message, "Seu status foi atualizado para disponível.")
+    
+    # exemplo de como buscar jogadores disponíveis
+    # retorna uma lista de jogadores disponíveis quando o jogador envia a mensagem "jogadores"
+    if message.text == "jogadores":
+        jogadores = buscar_jogadores_disponiveis()
+        if jogadores:
+            lista_jogadores = "Jogadores disponíveis:\n"
+            for jogador in jogadores:
+                lista_jogadores += f"{jogador[1]} {jogador[2]} (id: {jogador[0]})\n"
+            bot.reply_to(message, lista_jogadores)
+        else:
+            bot.reply_to(message, "Não há jogadores disponíveis no momento.")
+                
 # Mensagem de boas-vindas
 def welcome_message(message):
     text = "Bem-vindo ao jogo do dilema dos prisioneiros!\n\n" \
@@ -76,8 +122,6 @@ def welcome_message(message):
 @bot.message_handler(commands=['start'])
 def start_message(message):
     jogador_id = message.chat.id
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
     c.execute("SELECT * FROM jogadores WHERE id=?", (jogador_id,))
     row = c.fetchone()
     jogador_nome = ""
@@ -88,74 +132,24 @@ def start_message(message):
     else:
         jogador_nome = row[1]
     bot.reply_to(message, "Bem-vindo, " + jogador_nome + "! Você está disponível para jogar!")
-    conn.close()        
-            
+    conn.close()
+        
     # Imprime o menu com a descrição do jogo
     welcome_message(message)
 
-# Handler para o comando /register
 @bot.message_handler(commands=['register'])
-def register_message(message):
+def register_handler(message):
     # Envia uma mensagem de boas-vindas e instruções para o jogador
     bot.send_message(message.chat.id, "Bem-vindo ao jogo! Por favor, preencha o formulário de cadastro com as seguintes informações:")
     bot.send_message(message.chat.id, "Nome:")
     
-    # Adiciona o jogador à lista de jogadores aguardando cadastro
-    jogadores_aguardando_cadastro.append(message.chat.id)
-
-# Handler para receber as informações de cadastro
-@bot.message_handler(func=lambda message: message.chat.id in jogadores_aguardando_cadastro)
-def receive_registration_info(message):
-    jogador_id = message.chat.id
+    # Define o nome e o ID do jogador
     jogador_nome = message.text
+    jogador_id = message.chat.id
     
     # Atualiza o nome do jogador no banco de dados
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
     c.execute("UPDATE jogadores SET nome = ?, disponivel = ? WHERE id = ?", (jogador_nome, 1, jogador_id))
     conn.commit()
-    conn.close()
-    
-    # Remove o jogador da lista de jogadores aguardando cadastro
-    jogadores_aguardando_cadastro.remove(jogador_id)
-    
-    # Envia uma mensagem de confirmação ao jogador
-    bot.send_message(jogador_id, "Cadastro realizado com sucesso! Agora você está disponível para jogar.")
-
-# Registra novos usuário para o pareamento
-@bot.message_handler(commands=['register'])
-def register_message(message):
-    jogador_id = message.chat.id
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute("SELECT * FROM jogadores WHERE id=?", (jogador_id,))
-    row = c.fetchone()
-    if row is None:
-        jogadores_aguardando_cadastro.append(jogador_id)
-        bot.reply_to(message, "Digite o seu nome completo para se cadastrar.")
-    else:
-        bot.reply_to(message, "Você já está cadastrado. Use o comando /disponivel para ficar disponível para jogar.")
-    conn.close()
-    buscar_jogadores_disponiveis()
-
-# Lista de jogadores aguardando cadastro
-jogadores_aguardando_cadastro = []
-
-# Handler para receber as informações de cadastro
-@bot.message_handler(func=lambda message: message.chat.id in jogadores_aguardando_cadastro)
-def receive_registration_info(message):
-    jogador_id = message.chat.id
-    jogador_nome = message.text
-    
-    # Atualiza o nome do jogador no banco de dados
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute("UPDATE jogadores SET nome = ?, disponivel = ? WHERE id = ?", (jogador_nome, 1, jogador_id))
-    conn.commit()
-    conn.close()
-    
-    # Remove o jogador da lista de jogadores aguardando cadastro
-    jogadores_aguardando_cadastro.remove(jogador_id)
     
     # Envia uma mensagem de confirmação ao jogador
     bot.send_message(jogador_id, "Cadastro realizado com sucesso! Agora você está disponível para jogar.")

@@ -1,6 +1,38 @@
 # Game-Theory
  Teoria dos jogos - Aplicações
 
+bot/
+├── bot/
+│   ├── migrations/
+│   │   └── ...
+│   ├── templates/
+│   │   └── ...
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── tasks.py
+│   ├── tests.py
+│   └── views.py
+├── static/
+│   └── ...
+├── media/
+│   └── ...
+├── theory_game/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── config.py
+│   └── requirements.txt
+├── mysite/
+│   ├── __init__.py
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── manage.py
+└── requirements.txt
+
+
 O código é um jogo chamado "Dilema dos prisioneiros" que é implementado no aplicativo de mensagens do Telegram usando a biblioteca Telebot. No jogo, os jogadores escolhem entre cooperar ou trair para obter uma pontuação, que é calculada com base nas escolhas feitas por ambos os jogadores.
 
 O jogo começa com os jogadores enviando a mensagem "/start" para o bot para se inscreverem. Se houver apenas um jogador, ele terá que esperar até que outro jogador se inscreva para poder jogar. O jogo pode ser jogado sozinho usando o comando "/cpu".
