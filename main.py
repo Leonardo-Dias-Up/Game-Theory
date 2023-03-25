@@ -177,8 +177,8 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS users
                 is_available BOOLEAN DEFAULT 0)''')
 
 
-# Handler for /start command
-@bot.message_handler(commands=['start'])
+# Handler for /begin command
+@bot.message_handler(commands=['begin'])
 def start(message):
     chat_id = message.chat.id
     first_name = message.chat.first_name
