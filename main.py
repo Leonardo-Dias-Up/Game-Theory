@@ -129,6 +129,28 @@ def jogada(message):
         # Envia mensagem para o oponente fazer sua jogada
         bot.send_message(opponent_id, f"O seu oponente jogou: {message.text.lower()}\nAgora é a sua vez de jogar!")
 
+    # Envia mensagem com as pontuações atuais dos jogadores
+    bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}\nPontuação do oponente: {scores[opponent_id]}")
+
+    # Pergunta se o jogador deseja jogar novamente
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    keyboard.row(
+        telebot.types.InlineKeyboardButton('Sim', callback_data='sim'),
+        telebot.types.InlineKeyboardButton('Não', callback_data='nao')
+    )
+    bot.send_message(player_id, 'Deseja jogar novamente?', reply_markup=keyboard)
+        
+@bot.callback_query_handler(func=lambda call: True)
+def callback_handler(call):
+    player_id = call.from_user.id
+    
+    if call.data == 'sim':
+        bot.send_message(player_id, 'Ok, vamos jogar novamente!')
+        
+        if players[player_id]["opponent_id"] == player_id:
+            jogar_contra_cpu(call.message)
+        else:
+            bot.send_message(player_id, 'Aguarde até que seu oponente jogue!')
 
 if __name__ == "__main__":
     bot.polling()
