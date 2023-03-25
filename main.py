@@ -53,6 +53,7 @@ conn.commit()
 def buscar_jogadores_disponiveis():
     c.execute("SELECT id, nome, sobrenome FROM jogadores WHERE disponivel = 1")
     jogadores = c.fetchall()
+    bot.send_message(jogadores)
     return jogadores
 
 # Função para atualizar o status de disponibilidade do jogador no banco de dados
@@ -340,6 +341,26 @@ def iniciar_rodada(player_id, opponent_id):
     # Iniciar a jogada
     iniciar_jogo(player_id, opponent_id, player_decision)
 
+def multiplayer_matchmaking(message):
+    # Busca por jogadores disponíveis no banco de dados
+    jogadores_disponiveis = buscar_jogadores_disponiveis()
+
+    # Seleciona dois jogadores aleatórios da lista de jogadores disponíveis
+    if len(jogadores_disponiveis) >= 2:
+        jogador_1, jogador_2 = sample(jogadores_disponiveis, 2)
+        jogador_1_id, jogador_1_nome, jogador_1_sobrenome = jogador_1
+        jogador_2_id, jogador_2_nome, jogador_2_sobrenome = jogador_2
+
+        # Atualiza o status de disponibilidade dos jogadores no banco de dados
+        atualizar_disponibilidade_jogador(jogador_1_id, 0)
+        atualizar_disponibilidade_jogador(jogador_2_id, 0)
+
+        # Envia uma mensagem aos jogadores informando que foram pareados e iniciando a partida
+        bot.send_message(jogador_1_id, f"Você foi pareado com {jogador_2_nome} {jogador_2_sobrenome}. A partida começou!")
+        bot.send_message(jogador_2_id, f"Você foi pareado com {jogador_1_nome} {jogador_1_sobrenome}. A partida começou!")
+    else:
+        bot.send_message(message.chat.id, "Desculpe, não há jogadores suficientes disponíveis para jogar multiplayer no momento. Tente novamente mais tarde.")
+
 
 # Define um dicionário para armazenar as salas de jogo
 game_rooms = {}
@@ -348,6 +369,7 @@ game_rooms = {}
 # Handler para o comando /multiplayer
 @bot.message_handler(commands=['multiplayer'])
 def jogar_multiplayer_mensagem(message):
+    multiplayer_matchmaking(message)
     player_id = message.from_user.id
     
     if player_id not in game_rooms:
