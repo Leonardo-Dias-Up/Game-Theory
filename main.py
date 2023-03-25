@@ -186,6 +186,11 @@ def start(message):
     
     # Pergunta o nome para salvar
     bot.reply_to(message, "Olá! Qual o seu nome?")
+    
+    # Cria um handler para a próxima mensagem do usuário, que irá tratar o nome
+    bot.register_next_step_handler(message, save_name)
+    
+def save_name(message):
     name = message.text
     
     conn = sqlite3.connect('database.db')
@@ -195,7 +200,7 @@ def start(message):
         cursor.execute("SELECT name FROM users WHERE id = ?", (chat_id,))
         row = cursor.fetchone()
         name = row[0] if row else 'unknown'
-        cursor.execute("INSERT OR IGNORE INTO users (id, name, is_available) VALUES (?, ?, ?)", (chat_id, name, 0))
+        cursor.execute("INSERT INTO users (id, name, is_available) VALUES (?, ?, ?)", (chat_id, name, 0))
         cursor.connection.commit()
     except Exception as e:
         print(e)
