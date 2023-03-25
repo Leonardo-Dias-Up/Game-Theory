@@ -15,7 +15,6 @@ updates = bot.get_updates()
 # Dicionários para armazenar os jogadores e pontuações
 players = {}
 scores = {}
-games = {}
 acumulated_scores = {}
 
 # Contador de rodadas
@@ -110,47 +109,47 @@ def jogada(message):
         
         # Calcula a pontuação dos jogadores e atualiza o dicionário de pontuações
         if player_decision == "c" and opponent_decision == "t":
-            scores[player_id] = +5
-            scores[opponent_id] = +5
-            acumulated_scores[player_id] += 5
+            scores[player_id] = [5]
+            scores[opponent_id] = [5]
+            acumulated_scores[player_id] += scores[player_id]
             if opponent_id is not None:
-                acumulated_scores[opponent_id] += 5
+                acumulated_scores[opponent_id] += scores[opponent_id]
             else:
-                acumulated_scores[opponent_id] += 5
-            bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam 5 pontos!")
+                acumulated_scores[opponent_id] += scores[opponent_id]
+            bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam" + f"{scores[player_id]} pontos!")
         
         elif player_decision == "c" and opponent_decision == "t":
-            scores[player_id] = -10
-            scores[opponent_id] = +10
-            acumulated_scores[player_id]  -= 10
+            scores[player_id] = [-10]
+            scores[opponent_id] = [10]
+            acumulated_scores[player_id] += scores[player_id]
             if opponent_id is not None:
-                acumulated_scores[opponent_id] += 10
+                acumulated_scores[opponent_id] += scores[opponent_id]
             else:
-                acumulated_scores[opponent_id] += 10
-            bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu 10 pontos!")
+                acumulated_scores[opponent_id] += scores[opponent_id]
+            bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu" + f"{scores[player_id]} pontos!")
         
         elif player_decision == "t" and opponent_decision == "c":
-            scores[player_id] = +10
-            scores[opponent_id] = -10
-            acumulated_scores[player_id]  += 10
+            scores[player_id] = [10]
+            scores[opponent_id] = [-10]
+            acumulated_scores[player_id] += scores[player_id]
             if opponent_id is not None:
-                acumulated_scores[opponent_id] -= 10
+                acumulated_scores[opponent_id] += scores[opponent_id]
             else:
-                acumulated_scores[opponent_id] -= 10
-            bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 10 pontos!")
+                acumulated_scores[opponent_id] += scores[opponent_id]
+            bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou" + f"{scores[player_id]} pontos!")
         
         else:
-            bot.send_message(player_id, "Você e seu oponente traíram. Vocês ganharam 1 ponto cada!")
-            scores[player_id] = +1
-            scores[opponent_id] = +1
-            acumulated_scores[player_id]  += 1
+            bot.send_message(player_id, "Você e seu oponente traíram. Ambos ganharam" + f"{scores[player_id]} pontos!")
+            scores[player_id] = [1]
+            scores[opponent_id] = [1]
+            acumulated_scores[player_id] += scores[player_id]
             if opponent_id is not None:
-                acumulated_scores[opponent_id] += 1
+                acumulated_scores[opponent_id] += scores[opponent_id]
             else:
-                acumulated_scores[opponent_id] += 1
+                acumulated_scores[opponent_id] += scores[opponent_id]
         # Envia mensagem com as pontuações atuais dos jogadores e remove os jogadores do dicionário de jogadores
         bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}\nPontuação do oponente: {scores[opponent_id]}")
-        bot.send_message(player_id, f"Sua pontuação acumulada: {acumulated_scores[player_id][0]}\nPontuação do oponente: {acumulated_scores[opponent_id][0]}")
+        bot.send_message(player_id, f"Sua pontuação acumulada: {acumulated_scores[player_id]}\nPontuação do oponente: {acumulated_scores[opponent_id]}")
         bot.send_message(player_id, "Digite /pvp para jogar novamente contra um jogador ou /cpu para jogar contra o computador ou digite qualquer outra coisa para sair.")
         players.pop(player_id)
         
