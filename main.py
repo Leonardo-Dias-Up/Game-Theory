@@ -186,6 +186,9 @@ def start(message):
     
     # Ask the user for their name
     bot.reply_to(message, "Olá! Qual o seu nome?")
+    # Cria um handler para a próxima mensagem do usuário, que irá tratar o nome
+    bot.register_next_step_handler(message)
+    
     name = message.text
     
     conn = sqlite3.connect('database.db')
