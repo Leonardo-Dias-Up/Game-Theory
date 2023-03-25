@@ -50,7 +50,6 @@ def jogar_contra_cpu(message):
     global opponent_decision 
     
     opponent_decision = choice(["c", "t"])
-    opponent_decision = players[opponent_id]["decision"] 
 
     # Adiciona o jogador ao dicionário de jogadores
     players[player_id] = {"name": message.from_user.first_name, "decision": None, "opponent_id": player_id}
@@ -127,7 +126,6 @@ def jogada(message):
     else:
         # Envia mensagem para o oponente fazer sua jogada
         bot.send_message(opponent_id, f"O seu oponente jogou: {message.text.lower()}\nAgora é a sua vez de jogar!")
-
 
 
 if __name__ == "__main__":
