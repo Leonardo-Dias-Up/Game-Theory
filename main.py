@@ -64,8 +64,8 @@ def jogar_pvp(message):
     
     global opponent_decision 
     
-    opponent_id = players[player_id]["opponent_id"]
-    opponent_decision = players[opponent_id]["decision"] 
+    opponent_id = players.get(player_id, {}).get("opponent_id")
+    opponent_decision = players.get(opponent_id, {}).get("decision")
        
     player_id = message.from_user.id
     
@@ -115,8 +115,10 @@ def jogada(message):
             bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou 10 pontos!")
         
         else:
-            bot.send_message(player_id, "Você e seu oponente traíram. Nenhum ganho de pontos.")
-        
+            bot.send_message(player_id, "Você e seu oponente traíram. Vocês ganharam 1 ponto cada!")
+            scores[player_id] += 1
+            scores[opponent_id] += 1
+            
         # Envia mensagem com as pontuações atuais dos jogadores e remove os jogadores do dicionário de jogadores
         bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}\nPontuação do oponente: {scores[opponent_id]}")
         bot.send_message(player_id, "Digite /cpu para jogar novamente contra o computador ou digite qualquer outra coisa para sair.")
