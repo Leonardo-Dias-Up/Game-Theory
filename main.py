@@ -183,10 +183,21 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS users
 def start(message):
     chat_id = message.chat.id
     name = message.chat.first_name
-
-    # insert user if not exists
-    cursor.execute("INSERT OR IGNORE INTO users (id, name, available) VALUES (?, ?, ?)", (chat_id, name, 0))
-    conn.commit()
+    
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT name FROM users WHERE id = ?", (chat_id,))
+        row = cursor.fetchone()
+        name = row[0] if row else 'unknown'
+        cursor.execute("INSERT OR IGNORE INTO users (id, name, available) VALUES (?, ?, ?)", (chat_id, name, 0))
+        cursor.connection.commit()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
 
     bot.reply_to(message, f"Olá {name}, bem-vindo(a) ao bot!")
 
@@ -195,10 +206,38 @@ def start(message):
 def set_available(message):
     chat_id = message.chat.id
 
-    # update user availability
-    cursor.execute("UPDATE users SET available = ? WHERE id = ?", (1, chat_id))
-    conn.commit()
+# get_users command
+@bot.message_handler(commands=['get_users'])
+def get_users(message):
 
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    
+    try:
+        users = []
+        for row in cursor.execute("SELECT * FROM users"):
+            users.append(row[1])
+
+        bot.reply_to(message, f"Usuários cadastrados: {', '.join(users)}")
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    
+    try:
+        # update user availability
+        cursor.execute("UPDATE users SET available = ? WHERE id = ?", (1, chat_id))
+        conn.commit()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+        
     bot.reply_to(message, "Você está agora disponível!")
 
 # set_unavailable command
@@ -206,18 +245,39 @@ def set_available(message):
 def set_unavailable(message):
     chat_id = message.chat.id
 
-    # update user availability
-    cursor.execute("UPDATE users SET available = ? WHERE id = ?", (0, chat_id))
-    conn.commit()
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    try:
+        # update user availability
+        cursor.execute("UPDATE users SET available = ? WHERE id = ?", (0, chat_id))
+        conn.commit()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
 
     bot.reply_to(message, "Você não está mais disponível.")
 
 # get_users command
 @bot.message_handler(commands=['get_users'])
 def get_users(message):
-    users = []
-    for row in cursor.execute("SELECT * FROM users"):
-        users.append(row[1])
+
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    
+    try:
+        users = []
+        for row in cursor.execute("SELECT * FROM users"):
+            users.append(row[1])
+
+        bot.reply_to(message, f"Usuários cadastrados: {', '.join(users)}")
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
 
     bot.reply_to(message, f"Usuários cadastrados: {', '.join(users)}")
 
