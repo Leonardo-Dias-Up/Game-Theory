@@ -164,7 +164,7 @@ def jogada(message):
         bot.send_message(opponent_id, f"O seu oponente jogou: {message.text.lower()}\nAgora é a sua vez de jogar!")
 
 # Comando para listar usuários online
-@bot.command_handler(commands=["online"])
+@bot.message_handler(commands=["online"])
 def list_online_users(message):
     response = "Usuários online:\n"
     members_count = bot.get_chat_members_count(message.chat.id)
@@ -173,7 +173,6 @@ def list_online_users(message):
             continue
         response += f"- {member.user.first_name}\n"
     bot.send_message(message.chat.id, response)
-
     
 if __name__ == "__main__":
     bot.polling()
