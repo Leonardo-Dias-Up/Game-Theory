@@ -110,8 +110,8 @@ def jogada(message):
         
         # Calcula a pontuação dos jogadores e atualiza o dicionário de pontuações
         if player_decision == "c" and opponent_decision == "t":
-            scores[player_id] += 5
-            scores[opponent_id] += 5
+            scores[player_id] = +5
+            scores[opponent_id] = +5
             acumulated_scores[player_id] += 5
             if opponent_id is not None:
                 acumulated_scores[opponent_id] += 5
@@ -120,8 +120,8 @@ def jogada(message):
             bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam 5 pontos!")
         
         elif player_decision == "c" and opponent_decision == "t":
-            scores[player_id] -= 10
-            scores[opponent_id] += 10
+            scores[player_id] = -10
+            scores[opponent_id] = +10
             acumulated_scores[player_id]  -= 10
             if opponent_id is not None:
                 acumulated_scores[opponent_id] += 10
@@ -130,8 +130,8 @@ def jogada(message):
             bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu 10 pontos!")
         
         elif player_decision == "t" and opponent_decision == "c":
-            scores[player_id] += 10
-            scores[opponent_id] -= 10
+            scores[player_id] = +10
+            scores[opponent_id] = -10
             acumulated_scores[player_id]  += 10
             if opponent_id is not None:
                 acumulated_scores[opponent_id] -= 10
@@ -141,8 +141,8 @@ def jogada(message):
         
         else:
             bot.send_message(player_id, "Você e seu oponente traíram. Vocês ganharam 1 ponto cada!")
-            scores[player_id] += 1
-            scores[opponent_id] += 1
+            scores[player_id] = +1
+            scores[opponent_id] = +1
             acumulated_scores[player_id]  += 1
             if opponent_id is not None:
                 acumulated_scores[opponent_id] += 1
