@@ -216,7 +216,7 @@ def jogar_contra_cpu(message):
                 
                # Verificar as decisões de ambos os jogadores
                 if player_decision == "cooperar" and opponent_decision == "cooperar":
-                    scores[player_id] += 2
+                    scores[player_id] += 1
                     
                     # Respostas das escolhas tomadas pelos jogadores
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
@@ -227,7 +227,7 @@ def jogar_contra_cpu(message):
                     players.pop(player_id)
                     
                 elif player_decision == "cooperar" and opponent_decision == "trair":
-                    scores[player_id] -= 1
+                    scores[player_id] -= -10
                     
                     # Respostas das escolhas tomadas pelos jogadores
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
@@ -238,7 +238,7 @@ def jogar_contra_cpu(message):
                     players.pop(player_id)
                     
                 elif player_decision == "trair" and opponent_decision == "cooperar":
-                    scores[player_id] += 3
+                    scores[player_id] += 10
 
                     # Respostas das escolhas tomadas pelos jogadores
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
@@ -250,6 +250,7 @@ def jogar_contra_cpu(message):
                     
                 else:                  
                     # Respostas das escolhas tomadas pelos jogadores
+                    scores[player_id] += 1
                     bot.send_message(player_id, f"Sua escolha: {player_decision}")
                     bot.send_message(player_id, f"O seu oponente jogou: {opponent_decision}")
                     bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}")
