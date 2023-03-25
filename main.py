@@ -163,51 +163,6 @@ def jogada(message):
         # Envia mensagem para o oponente fazer sua jogada
         bot.send_message(opponent_id, f"O seu oponente jogou: {message.text.lower()}\nAgora é a sua vez de jogar!")
 
-# Lista de salas e seus jogadores
-rooms = {}
-
-# Comando para listar as salas abertas
-@bot.command_handler(commands=["rooms"])
-def list_rooms(message):
-    if not rooms:
-        bot.send_message(message.chat.id, "Não há salas abertas no momento.")
-        return
-    response = "Salas abertas:\n"
-    for room_id, room in rooms.items():
-        response += f"\nID da sala: {room_id}\nJogadores: "
-        for player_id in room:
-            response += f"{bot.get_chat_member(message.chat.id, player_id).user.first_name}, "
-        response = response[:-2]  # Remove a última vírgula e espaço
-    bot.send_message(message.chat.id, response)
-
-# Comando para entrar em uma sala
-@bot.command_handler(commands=["join"])
-def join_room(message):
-    # Verifica se o jogador já está em uma sala
-    if message.from_user.id in [player for room in rooms.values() for player in room]:
-        bot.send_message(message.chat.id, "Você já está em uma sala.")
-        return
-
-    # Verifica se o id da sala foi informado corretamente
-    try:
-        room_id = int(message.text.split()[1])
-    except:
-        bot.send_message(message.chat.id, "ID da sala inválido.")
-        return
-
-    # Verifica se a sala existe
-    if room_id not in rooms:
-        bot.send_message(message.chat.id, "A sala não existe.")
-        return
-
-    # Verifica se há espaço na sala
-    if len(rooms[room_id]) == 2:
-        bot.send_message(message.chat.id, "A sala está cheia.")
-        return
-
-    # Adiciona o jogador à sala
-    rooms[room_id].append(message.from_user.id)
-    bot.send_message(message.chat.id, f"Você entrou na sala {room_id}. Aguarde seu oponente.")
 
 if __name__ == "__main__":
     bot.polling()
