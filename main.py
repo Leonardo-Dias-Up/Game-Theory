@@ -106,7 +106,7 @@ def jogada(message):
             opponent_decision = players[opponent_id]["decision"]
         else:
             opponent_decision = choice(["c", "t"])
-            opponent_id = randint(1000000000, 9999999999)  # Gera um id aleatório
+            opponent_id = 123987456  # Gera um id aleatório
         
         # Calcula a pontuação dos jogadores e atualiza o dicionário de pontuações
         if player_decision == "c" and opponent_decision == "c":
@@ -116,7 +116,7 @@ def jogada(message):
             if opponent_id in acumulated_scores:
                 acumulated_scores[opponent_id] += scores[opponent_id][0]
             else:
-                acumulated_scores[opponent_id] += scores[opponent_id][0]
+                acumulated_scores[opponent_id] = scores[opponent_id][0]
             bot.send_message(player_id, "Você e seu oponente cooperaram. Ambos ganharam" + f" {scores[player_id]} pontos!")
         
         elif player_decision == "c" and opponent_decision == "t":
@@ -126,7 +126,7 @@ def jogada(message):
             if opponent_id in acumulated_scores:
                 acumulated_scores[opponent_id] += scores[opponent_id][0]
             else:
-                acumulated_scores[opponent_id] += scores[opponent_id][0]
+                acumulated_scores[opponent_id] = scores[opponent_id][0]
             bot.send_message(player_id, "Você cooperou, mas seu oponente traiu. Você perdeu" + f" {scores[player_id]} pontos!")
         
         elif player_decision == "t" and opponent_decision == "c":
@@ -151,7 +151,7 @@ def jogada(message):
             
         # Envia mensagem com as pontuações atuais dos jogadores e remove os jogadores do dicionário de jogadores
         bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}\nPontuação do oponente: {scores[opponent_id]}")
-        bot.send_message(player_id, f"Sua pontuação acumulada: {acumulated_scores[player_id]}\nPontuação do oponente: {acumulated_scores[opponent_id]}")
+        bot.send_message(player_id, f"Sua pontuação acumulada: {acumulated_scores[player_id]}\nPontuação acumulada do oponente: {acumulated_scores[opponent_id]}")
         bot.send_message(player_id, "Digite /pvp para jogar novamente contra um jogador ou /cpu para jogar contra o computador ou digite qualquer outra coisa para sair.")
         players.pop(player_id)
         
