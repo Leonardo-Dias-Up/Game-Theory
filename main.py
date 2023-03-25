@@ -346,7 +346,6 @@ game_rooms = {}
 # Handler para o comando /multiplayer
 @bot.message_handler(commands=['multiplayer'])
 def jogar_multiplayer_mensagem(message):
-    multiplayer_matchmaking(message)
     player_id = message.from_user.id
     
     if player_id not in game_rooms:
