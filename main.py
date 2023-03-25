@@ -150,7 +150,7 @@ def jogada(message):
                 acumulated_scores[opponent_id] += 1
         # Envia mensagem com as pontuações atuais dos jogadores e remove os jogadores do dicionário de jogadores
         bot.send_message(player_id, f"Sua pontuação atual: {scores[player_id]}\nPontuação do oponente: {scores[opponent_id]}")
-        bot.send_message(player_id, f"Sua pontuação acumulada: {acumulated_scores[player_id]}\nPontuação do oponente: {acumulated_scores[opponent_id]}")
+        bot.send_message(player_id, f"Sua pontuação acumulada: {acumulated_scores[player_id][0]}\nPontuação do oponente: {acumulated_scores[opponent_id][0]}")
         bot.send_message(player_id, "Digite /pvp para jogar novamente contra um jogador ou /cpu para jogar contra o computador ou digite qualquer outra coisa para sair.")
         players.pop(player_id)
         
