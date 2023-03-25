@@ -19,9 +19,6 @@ scores = {}
 # Contador de rodadas
 round_number = 0
 
-# Dicionário para armazenar os jogadores disponíveis para jogo multiplayer
-jogadores_disponiveis = {}
-
 # Função que descreve os desenvolvedores do jogo
 def describe_project(message):
     text = "Desenvolvedores: Leonardo Dias e Djalma. 2023"
@@ -36,7 +33,7 @@ def help_message(message):
 def welcome_message(message):
     text = "Bem-vindo ao jogo do dilema dos prisioneiros!\n\n" \
            "O objetivo do jogo é maximizar sua pontuação ao cooperar ou trair seu oponente. Cada jogador deve escolher 'cooperar' ou 'trair'.\n\n" \
-           "Digite 'cooperar' ou 'trair' para jogar. Você pode jogar contra outros jogadores ou contra a máquina. Para jogar contra a máquina, digite /cpu. Para jogar contra outros jogadores, digite /multiplayer."
+           "Digite 'cooperar' ou 'trair' para jogar. Você pode jogar contra outros jogadores ou contra a máquina. Para jogar contra a máquina, digite /cpu."
     bot.send_message(message.chat.id, text)
     
 # Handler para o comando /start
@@ -46,28 +43,22 @@ def start_message(message):
 
 # Handler para o comando /cpu
 @bot.message_handler(commands=['cpu'])
-def jogar_cpu_ou_so_mensagem(message):
-    if message.text == '/cpu':
-        player_id = message.from_user.id
-
-    if player_id not in players:
-         
-        # Handler para o comando /cpu
-        players[player_id] = {"name": message.from_user.first_name, "decision": None, "opponent_id": player_id}
-        
-        # Inicializa a pontuação do jogador em 0
-        scores[player_id] = 0
-        
-        # Envia mensagem para o jogador escolher sua jogada
-        bot.send_message(player_id, "Digite 'cooperar' ou 'trair' para fazer sua escolha.")
-    else:
-        bot.send_message(player_id, "Você já está jogando contra si mesmo!")
 
 # Envia mensagem para o jogador escolher sua jogada
-@bot.message_handler(func=lambda message: True)
 def jogar_contra_cpu(message):
+    
+    if message.text == '/cpu':
+        player_id = message.from_user.id
+        
     player_id = message.from_user.id
-
+    
+    # Handler para o comando /cpu
+    players[player_id] = {"name": message.from_user.first_name, "decision": None, "opponent_id": player_id}
+    
+    # Inicializa a pontuação do jogador em 0
+    scores[player_id] = 0
+    bot.send_message(player_id, "Digite 'cooperar' ou 'trair' para fazer sua escolha.")
+    
     # Envia mensagem para o jogador escolher sua jogada
     if player_id in players:
         opponent_id = players[player_id]["opponent_id"]
@@ -131,14 +122,6 @@ def jogar_contra_cpu(message):
         else:
             bot.send_message("Obrigado por Jogar")
 
-# Handler para o comando /pontuacao
-@bot.message_handler(commands=['pontuacao'])
-def pontuacao_message(message):
-    text = "Pontuações:\n\n"
-    for player_id, score in scores.items():
-        player_name = players[player_id]["name"]
-        text += f"{player_name}: {score}\n"
-    bot.send_message(message.chat.id, text)
-    
+   
 if __name__ == "__main__":
     bot.polling()
