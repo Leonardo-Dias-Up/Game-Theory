@@ -141,9 +141,9 @@ def jogada(message):
             bot.send_message(player_id, "Você traiu, mas seu oponente cooperou. Você ganhou" + f" {scores[player_id]} pontos!")
         
         else:
-            bot.send_message(player_id, "Você e seu oponente traíram. Ambos ganharam" + f" {scores[player_id]} pontos!")
             scores[player_id] = [1]
             scores[opponent_id] = [1]
+            bot.send_message(player_id, "Você e seu oponente traíram. Ambos ganharam" + f" {scores[player_id]} pontos!")
             acumulated_scores[player_id] += scores[player_id][0] 
             if opponent_id in acumulated_scores:
                 acumulated_scores[opponent_id] += scores[opponent_id][0]
@@ -206,9 +206,6 @@ def save_name(message, chat_id):
         conn.close()
 
     bot.reply_to(message, f"Seja bem vindo {name} ao jogo Dilema dos Prisioneiros!")
-
-
-
 
 # set_available command
 @bot.message_handler(commands=['set_available'])
@@ -308,6 +305,99 @@ def get_users(message):
 # close connection and cursor
 cursor.close()
 conn.close()
+
+
+# %%
+"""
+    # Cria conexão com o banco de dados
+conn = sqlite3.connect('database.db')
+cursor = conn.cursor()
+
+# Cria tabela questions
+cursor.execute('''CREATE TABLE questions
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT, option1 TEXT, option2 TEXT)''')
+
+# Insere a pergunta na tabela questions
+cursor.execute("INSERT INTO questions (text, option1, option2) VALUES ('Cooperar ou trair?', 'Cooperar', 'Trair')")
+
+# Fecha a conexão com o banco de dados
+conn.commit()
+cursor.close()
+conn.close()
+"""
+
+"""
+import sqlite3
+import schedule
+import time
+
+# Cria conexão com o banco de dados
+conn = sqlite3.connect('database.db')
+cursor = conn.cursor()
+
+# Função para verificar se há dois usuários disponíveis e enviar a pergunta
+def send_question():
+    # Verifica se há dois usuários disponíveis
+    cursor.execute("SELECT * FROM users WHERE is_available=1 LIMIT 2")
+    users = cursor.fetchall()
+    if len(users) == 2:
+        # Seleciona a pergunta aleatória
+        cursor.execute("SELECT * FROM questions ORDER BY RANDOM() LIMIT 1")
+        question, option1, option2 = cursor.fetchone()[1:]
+        
+        # Envia a pergunta para os usuários
+        for user in users:
+            message = f'{question}\n\n1. {option1}\n2. {option2}'
+            send_message(user[0], message)  # Envia a mensagem para o usuário
+            cursor.execute("UPDATE users SET is_available=0 WHERE id=?", (user[0],))
+        
+        # Insere a pergunta na tabela game_results
+        cursor.execute("INSERT INTO game_results (player1_id, player2_id, question_id) VALUES (?, ?, ?)", (users[0][0], users[1][0], question_id))
+        conn.commit()
+
+# Agendando a execução da função de verificação a cada 10 segundos
+schedule.every(10).seconds.do(send_question)
+
+# Loop infinito para executar as tarefas agendadas
+while True:
+    schedule.run_pending()
+    time.sleep(1)
     
+"""
+
+"""
+def play_game(player1_id, player2_id, question_id):
+    # Envia a pergunta para os jogadores
+    message = f"{question}\n\n1. {option1}\n2. {option2}"
+    send_message(player1_id, message)
+    send_message(player2_id, message)
+
+    # Aguarda as respostas dos jogadores
+    player1_choice = receive_message(player1_id)
+    player2_choice = receive_message(player2_id)
+
+    # Grava as respostas no banco de dados
+    cursor.execute(f"INSERT INTO game_results (player1_id, player2_id, question_id, player1_choice, player2_choice) VALUES ({player1_id}, {player2_id}, {question_id}, {player1_choice}, {player2_choice})")
+    conn.commit()
+
+    # Determina o resultado do jogo
+    if player1_choice == 1 and player2_choice == 1:
+        result = "Os dois jogadores cooperaram."
+    elif player1_choice == 1 and player2_choice == 2:
+        result = "O jogador 1 cooperou e o jogador 2 traiu."
+    elif player1_choice == 2 and player2_choice == 1:
+        result = "O jogador 1 traiu e o jogador 2 cooperou."
+    else:
+        result = "Os dois jogadores traíram."
+
+    # Atualiza o registro no banco de dados com o resultado
+    cursor.execute(f"UPDATE game_results SET result = '{result}' WHERE player1_id = {player1_id} AND player2_id = {player2_id} AND question_id = {question_id}")
+    conn.commit()
+
+    # Envia o resultado para os jogadores
+    send_message(player1_id, result)
+    send_message(player2_id, result)
+
+"""
 if __name__ == "__main__":
     bot.polling()
